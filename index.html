@@ -1,104 +1,192 @@
-\
-<!DOCTYPE html>
+from pathlib import Path
+
+html = '''<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>玄域修道录 · 完整修仙世界挂机版</title>
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>玄域修道录 v4 - 修仙挂机放置</title>
 <style>
   :root{
     --bg:#020617;
     --bg-panel:#020617;
-    --border:#1f2937;
-    --border-soft:#111827;
+    --bg-panel-soft:#020617;
+    --border-soft:#1f2937;
     --accent:#38bdf8;
-    --accent-soft:#0ea5e9;
+    --accent-soft:rgba(56,189,248,0.12);
+    --accent-strong:#0ea5e9;
     --text-main:#e5e7eb;
-    --text-sub:#9ca3af;
-    --hp:#f97373;
-    --mp:#60a5fa;
-    --xp:#fbbf24;
-    --rare0:#9ca3af;
-    --rare1:#e5e7eb;
-    --rare2:#22c55e;
-    --rare3:#38bdf8;
-    --rare4:#a855f7;
-    --rare5:#f97316;
-    --rare6:#facc15;
+    --text-soft:#9ca3af;
+    --danger:#f97373;
+    --good:#4ade80;
+    --warn:#fbbf24;
   }
   *{box-sizing:border-box;}
   body{
     margin:0;
     padding:0;
-    background:radial-gradient(circle at top,#020617 0,#000 60%);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    background:radial-gradient(circle at top,#020617 0,#000 55%);
     color:var(--text-main);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  }
+  #app{
+    max-width:1200px;
+    margin:12px auto 24px;
+    padding:12px;
+    border-radius:18px;
+    border:1px solid #111827;
+    background:linear-gradient(145deg,rgba(15,23,42,0.9),rgba(2,6,23,0.96));
+    box-shadow:0 24px 80px rgba(0,0,0,0.75);
+  }
+  header{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    align-items:flex-start;
+    border-bottom:1px solid #111827;
+    padding-bottom:8px;
+    margin-bottom:8px;
+  }
+  .title-area{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+  }
+  .game-title{
+    font-size:20px;
+    letter-spacing:2px;
+  }
+  .subtitle{
+    font-size:12px;
+    color:var(--text-soft);
+  }
+  .top-stats{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:4px 12px;
+    font-size:12px;
+  }
+  .stat-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .stat-label{
+    color:var(--text-soft);
+  }
+  .stat-value{
+    font-weight:500;
+  }
+  .pill{
+    display:inline-flex;
+    align-items:center;
+    padding:2px 8px;
+    border-radius:999px;
+    border:1px solid #1e293b;
+    font-size:11px;
+    color:var(--text-soft);
+  }
+  .btn-row{
+    display:flex;
+    gap:6px;
+    margin-top:4px;
+    flex-wrap:wrap;
+  }
+  button{
+    font-family:inherit;
+    border-radius:999px;
+    border:1px solid #1f2937;
+    background:radial-gradient(circle at top left,#0f172a,#020617);
+    color:var(--text-main);
+    padding:4px 10px;
+    font-size:12px;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+  }
+  button.primary{
+    border-color:var(--accent);
+    background:radial-gradient(circle at top left,#0ea5e9,#0369a1);
+    color:#0b1120;
+    font-weight:500;
+  }
+  button.danger{
+    border-color:#b91c1c;
+    background:radial-gradient(circle at top left,#b91c1c,#7f1d1d);
+    color:#fee2e2;
+  }
+  button.small{
+    padding:2px 8px;
+    font-size:11px;
+  }
+  button:disabled{
+    opacity:0.4;
+    cursor:default;
+  }
+  nav{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin-bottom:8px;
+    padding-bottom:6px;
+    border-bottom:1px solid #111827;
+  }
+  nav button{
+    border-radius:999px;
+    padding:4px 12px;
+    font-size:12px;
+    background:rgba(15,23,42,0.9);
+  }
+  nav button.active{
+    border-color:var(--accent);
+    background:var(--accent-soft);
+    color:var(--accent-strong);
+  }
+  main{
+    display:grid;
+    grid-template-columns:2.2fr 1.4fr;
+    gap:10px;
+  }
+  .page{
+    display:none;
+  }
+  .page.active{
+    display:block;
+  }
+  .panel{
+    border-radius:12px;
+    border:1px solid var(--border-soft);
+    background:radial-gradient(circle at top,rgba(15,23,42,0.94),rgba(2,6,23,0.98));
+    padding:8px 10px;
+    margin-bottom:8px;
+  }
+  .panel-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:6px;
+  }
+  .panel-title{
     font-size:14px;
   }
-  #topbar{
-    position:sticky;top:0;z-index:20;
-    background:#020617;
-    border-bottom:1px solid var(--border-soft);
-    padding:6px 10px 4px;
+  .tag{
+    font-size:10px;
+    color:var(--text-soft);
   }
-  #top-line{
-    display:flex;justify-content:space-between;align-items:center;
+  .attr-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:2px 8px;
+    font-size:12px;
   }
-  #title{
-    font-size:15px;font-weight:600;color:#facc15;
+  .attr-cell{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border-bottom:1px dashed #111827;
+    padding:2px 0;
   }
-  #top-stats span{margin-left:8px;font-size:12px;color:var(--text-sub);}
-  #nav{
-    margin-top:4px;display:flex;flex-wrap:wrap;gap:4px;
-  }
-  #nav button{
-    padding:3px 8px;font-size:12px;border-radius:999px;
-    border:1px solid #1f2937;background:#020617;color:var(--text-sub);
-    cursor:pointer;
-  }
-  #nav button.active{
-    background:var(--accent);border-color:var(--accent);color:#000;
-  }
-  .page{display:none;padding:8px 10px 16px;max-width:1300px;margin:0 auto;}
-  .page.active{display:block;}
-  #layout-main{
-    display:grid;grid-template-columns:minmax(260px,1fr) minmax(380px,1.4fr) minmax(260px,1fr);gap:8px;
-  }
-  @media(max-width:1024px){#layout-main{grid-template-columns:1fr;}}
-  .panel{
-    background:var(--bg-panel);border-radius:10px;border:1px solid var(--border);
-    padding:8px 10px 8px;box-shadow:0 16px 32px rgba(0,0,0,.55);
-  }
-  .panel-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
-  .panel-title{font-size:13px;font-weight:600;color:#facc15;}
-  .tag{font-size:11px;padding:2px 6px;border-radius:999px;border:1px solid #334155;color:var(--text-sub);}
-  .row{display:flex;flex-wrap:wrap;gap:4px;align-items:center;}
-  .stat-row{display:flex;justify-content:space-between;margin:2px 0;}
-  .stat-label{color:var(--text-sub);}
-  .stat-value{color:var(--text-main);}
-  .bar{width:100%;height:9px;border-radius:999px;background:#020617;border:1px solid var(--border-soft);overflow:hidden;margin:2px 0 4px;}
-  .bar-fill{height:100%;border-radius:999px;}
-  .hp{background:var(--hp);}
-  .mp{background:var(--mp);}
-  .xp{background:var(--xp);}
-  button.small{
-    padding:3px 7px;font-size:12px;border-radius:999px;border:1px solid #334155;
-    background:#020617;color:var(--text-main);cursor:pointer;
-  }
-  button.small.primary{border-color:var(--accent);color:var(--accent-soft);}
-  button.small:disabled{opacity:.4;cursor:not-allowed;}
-  .log{
-    background:#020617;border-radius:8px;border:1px solid #0f172a;
-    padding:4px 6px;height:200px;overflow-y:auto;font-size:12px;color:#a5b4fc;
-    white-space:pre-wrap;
-  }
-  .log p{margin:0;}
-  .attr-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;}
-  .attr-cell{display:flex;justify-content:space-between;font-size:12px;}
-  .pill{padding:2px 6px;font-size:11px;border-radius:999px;border:1px solid #111827;color:var(--text-sub);}
-  .equip-list,.item-list{max-height:220px;overflow-y:auto;margin-top:4px;}
-  .equip-item,.item-row{font-size:12px;padding:2px 0;border-bottom:1px dashed #111827;}
-  button.attr-btn{
+  .attr-btn{
     margin-left:4px;
     padding:0 6px;
     font-size:11px;
@@ -108,413 +196,453 @@
     color:var(--text-main);
     cursor:pointer;
   }
-  .rare-0{color:var(--rare0);}
-  .rare-1{color:var(--rare1);}
-  .rare-2{color:var(--rare2);}
-  .rare-3{color:var(--rare3);}
-  .rare-4{color:var(--rare4);}
-  .rare-5{color:var(--rare5);}
-  .rare-6{color:var(--rare6);}
-  .badge{
-    display:inline-block;font-size:10px;padding:0 4px;border-radius:4px;
-    border:1px solid #111827;color:var(--text-sub);margin-left:2px;
+  .equip-grid{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:4px;
+    font-size:11px;
   }
-  #equip-visual{
-    display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:6px;
+  .equip-slot{
+    border-radius:8px;
+    border:1px dashed #1f2937;
+    min-height:40px;
+    padding:2px 4px;
   }
-  .slot-cell{
-    border-radius:8px;border:1px dashed #1f2937;padding:4px 4px;min-height:46px;
-    font-size:11px;text-align:center;
+  .equip-slot-title{
+    color:var(--text-soft);
+    font-size:10px;
   }
-  .slot-name{color:var(--text-sub);font-size:10px;}
-  .slot-item{margin-top:2px;}
-  .filter-label{font-size:11px;color:var(--text-sub);margin-right:4px;}
-  .filter-group{display:flex;flex-wrap:wrap;gap:4px;}
-  .filter-btn{
-    padding:2px 6px;font-size:11px;border-radius:999px;border:1px solid #1f2937;background:#020617;color:var(--text-sub);cursor:pointer;
+  .equip-slot-name{
+    font-size:11px;
   }
-  .filter-btn.active{background:#0b1120;border-color:var(--accent);color:var(--accent-soft);}
-  table.simple{width:100%;border-collapse:collapse;font-size:12px;margin-top:4px;}
-  table.simple td,table.simple th{border-bottom:1px solid #111827;padding:3px 2px;text-align:left;}
-  table.simple th{color:var(--text-sub);font-weight:500;}
-  .small-label{font-size:11px;color:var(--text-sub);}
+  .equip-slot-empty{
+    color:#4b5563;
+  }
+  .log{
+    font-size:11px;
+    max-height:220px;
+    overflow-y:auto;
+    padding:4px 6px;
+    border-radius:8px;
+    border:1px solid #020617;
+    background:radial-gradient(circle at top left,#020617,#000);
+  }
+  .log p{
+    margin:0 0 2px;
+  }
+  .log .sys{
+    color:var(--text-soft);
+  }
+  .log .good{
+    color:var(--good);
+  }
+  .log .bad{
+    color:var(--danger);
+  }
+  .map-list{
+    max-height:260px;
+    overflow-y:auto;
+    font-size:12px;
+  }
+  .map-row{
+    padding:4px 4px;
+    border-radius:8px;
+    border:1px solid #111827;
+    margin-bottom:4px;
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+  }
+  .map-row.active{
+    border-color:var(--accent);
+    background:var(--accent-soft);
+  }
+  .map-name{
+    font-size:13px;
+  }
+  .map-meta{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    font-size:11px;
+    color:var(--text-soft);
+  }
+  .map-drop{
+    font-size:11px;
+    color:var(--text-soft);
+  }
+  .equip-list,.item-list{
+    max-height:220px;
+    overflow-y:auto;
+    margin-top:4px;
+    font-size:11px;
+  }
+  .equip-item,.item-row,.sect-task-row{
+    padding:3px 2px;
+    border-bottom:1px dashed #111827;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:4px;
+  }
+  .equip-item-main,.item-main{
+    display:flex;
+    flex-direction:column;
+    gap:1px;
+  }
+  .quality-1{color:#9ca3af;}
+  .quality-2{color:#a3e635;}
+  .quality-3{color:#38bdf8;}
+  .quality-4{color:#c4b5fd;}
+  .quality-5{color:#e5b3ff;}
+  .quality-6{color:#f97373;}
+  .small-label{
+    font-size:11px;
+    color:var(--text-soft);
+  }
+  .sect-name{
+    font-size:13px;
+  }
+  .sect-card{
+    padding:4px;
+    border-radius:8px;
+    border:1px solid #111827;
+    margin-bottom:4px;
+    font-size:11px;
+  }
+  .pet-list{
+    max-height:220px;
+    overflow-y:auto;
+    font-size:11px;
+  }
+  .pet-row{
+    padding:3px 2px;
+    border-bottom:1px dashed #111827;
+    display:flex;
+    justify-content:space-between;
+  }
+  .tower-log{
+    max-height:220px;
+    overflow-y:auto;
+    font-size:11px;
+    border-radius:8px;
+    border:1px solid #020617;
+    background:radial-gradient(circle at top left,#020617,#000);
+    padding:4px 6px;
+  }
+  .tower-log p{
+    margin:0 0 2px;
+  }
+  @media(max-width:900px){
+    main{
+      display:block;
+    }
+  }
 </style>
 </head>
 <body>
-<div id="topbar">
-  <div id="top-line">
-    <div id="title">玄域修道录 · 完整修仙世界挂机版</div>
-    <div id="top-stats">
-      <span>灵石：<span id="top-gold">0</span></span>
-      <span>境界：<span id="top-realm">凡人</span></span>
-      <span>当前地图：<span id="top-map">无</span></span>
-      <span>所属宗门：<span id="top-sect">无</span></span>
+<div id="app">
+  <header>
+    <div class="title-area">
+      <div class="game-title">玄域修道录 v4</div>
+      <div class="subtitle">庞大修仙世界 · 深度挂机 · 爬塔 · 转生</div>
+      <div class="btn-row">
+        <button id="btn-toggle-explore" class="primary">开始挂机</button>
+        <button id="btn-break">尝试突破境界</button>
+        <button id="btn-save" class="small">手动存档</button>
+      </div>
     </div>
-  </div>
-  <div id="nav">
-    <button data-page="home" class="active">洞府总览</button>
+    <div style="flex:1;">
+      <div class="top-stats">
+        <div class="stat-row"><span class="stat-label">道号</span><span class="stat-value" id="top-name"></span></div>
+        <div class="stat-row"><span class="stat-label">境界</span><span class="stat-value" id="top-realm"></span></div>
+        <div class="stat-row"><span class="stat-label">灵根</span><span class="stat-value" id="top-root"></span></div>
+        <div class="stat-row"><span class="stat-label">当前灵气</span><span class="stat-value" id="top-qi"></span></div>
+        <div class="stat-row"><span class="stat-label">战力</span><span class="stat-value" id="top-power"></span></div>
+        <div class="stat-row"><span class="stat-label">灵石</span><span class="stat-value" id="top-gold"></span></div>
+      </div>
+      <div class="btn-row" style="margin-top:4px;">
+        <span class="pill" id="top-map-pill">当前未选择挂机地点</span>
+        <span class="pill" id="top-sect-pill">未加入宗门</span>
+      </div>
+    </div>
+  </header>
+
+  <nav>
+    <button data-page="main" class="active">洞府总览</button>
     <button data-page="map">灵域地图</button>
-    <button data-page="warehouse">法器仓库</button>
+    <button data-page="equip">法器仓库</button>
     <button data-page="bag">百宝袋</button>
     <button data-page="forge">锻造炉</button>
     <button data-page="sect">十大宗门</button>
     <button data-page="pets">灵宠园</button>
+    <button data-page="tower">试炼之塔</button>
+    <button data-page="rebirth">转生重修</button>
     <button data-page="shop">万宝阁</button>
-    <button data-page="stats">成就与统计</button>
+    <button data-page="stats">统计成就</button>
     <button data-page="log">修道日志</button>
-  </div>
-</div>
+  </nav>
 
-<!-- 洞府总览 -->
-<div id="page-home" class="page active">
-  <div id="layout-main">
-    <!-- 左：角色、属性、神通 -->
+  <main>
+    <div>
+      <!-- 洞府总览 -->
+      <section id="page-main" class="page active">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">修行概况</div>
+            <div class="tag">境界、属性与当前状态</div>
+          </div>
+          <div class="stat-row"><span class="stat-label">气血</span><span class="stat-value" id="hp-text"></span></div>
+          <div class="stat-row"><span class="stat-label">真气</span><span class="stat-value" id="mp-text"></span></div>
+          <div class="stat-row"><span class="stat-label">攻击</span><span class="stat-value" id="atk-text"></span></div>
+          <div class="stat-row"><span class="stat-label">防御</span><span class="stat-value" id="def-text"></span></div>
+          <div class="stat-row"><span class="stat-label">暴击</span><span class="stat-value" id="crit-text"></span></div>
+          <div class="stat-row"><span class="stat-label">下一境界所需灵气</span><span class="stat-value" id="need-qi-text"></span></div>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">根骨与属性</div>
+            <div class="tag">突破可获得可分配属性点</div>
+          </div>
+          <div class="attr-grid">
+            <div class="attr-cell">
+              <span>力道</span>
+              <span><span id="attr-str">0</span><button class="attr-btn" data-add-attr="str">+</button></span>
+            </div>
+            <div class="attr-cell">
+              <span>体魄</span>
+              <span><span id="attr-vit">0</span><button class="attr-btn" data-add-attr="vit">+</button></span>
+            </div>
+            <div class="attr-cell">
+              <span>身法</span>
+              <span><span id="attr-agi">0</span><button class="attr-btn" data-add-attr="agi">+</button></span>
+            </div>
+            <div class="attr-cell">
+              <span>悟性</span>
+              <span><span id="attr-wis">0</span><button class="attr-btn" data-add-attr="wis">+</button></span>
+            </div>
+          </div>
+          <div class="stat-row" style="margin-top:4px;">
+            <span class="stat-label">可分配属性点</span><span class="stat-value" id="attr-free">0</span>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">当前战斗记录</div>
+            <div class="tag">最近几十场战斗过程一览</div>
+          </div>
+          <div id="battle-log" class="log"></div>
+        </div>
+      </section>
+
+      <!-- 灵域地图 -->
+      <section id="page-map" class="page">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">灵域地图</div>
+            <div class="tag">选择挂机地点</div>
+          </div>
+          <div class="map-list" id="map-list"></div>
+        </div>
+      </section>
+
+      <!-- 法器仓库 -->
+      <section id="page-equip" class="page">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">已穿戴法器</div>
+            <div class="tag">八件套决定你的基础战力</div>
+          </div>
+          <div class="equip-grid" id="equip-slots"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">仓库法器</div>
+            <div class="tag">掉落与锻造所得法器</div>
+          </div>
+          <div class="equip-list" id="equip-list"></div>
+          <div class="btn-row" style="margin-top:4px;">
+            <button id="btn-sell-low" class="small">一键出售低品质法器</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 百宝袋 -->
+      <section id="page-bag" class="page">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">百宝袋</div>
+            <div class="tag">丹药、材料、秘卷尽数收入囊中</div>
+          </div>
+          <div class="item-list" id="bag-list"></div>
+        </div>
+      </section>
+
+      <!-- 锻造炉 -->
+      <section id="page-forge" class="page">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">玄火锻造炉</div>
+            <div class="tag">以材料与灵石换取更强法器</div>
+          </div>
+          <div class="item-list" id="forge-list"></div>
+        </div>
+      </section>
+
+      <!-- 十大宗门 -->
+      <section id="page-sect" class="page">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">宗门选择</div>
+            <div class="tag">加入其一宗门，获得长期加成</div>
+          </div>
+          <div id="sect-list"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">宗门任务与宝库</div>
+            <div class="tag">完成任务可获宗门贡献，以换取稀有宝物</div>
+          </div>
+          <div class="stat-row"><span class="stat-label">当前宗门</span><span class="stat-value" id="sect-current-name"></span></div>
+          <div class="stat-row"><span class="stat-label">宗门贡献</span><span class="stat-value" id="sect-contrib"></span></div>
+          <div class="item-list" id="sect-task-list"></div>
+          <hr style="border:none;border-top:1px dashed #111827;margin:6px 0;">
+          <div class="item-list" id="sect-shop-list"></div>
+        </div>
+      </section>
+
+      <!-- 灵宠园 -->
+      <section id="page-pets" class="page">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">灵宠园</div>
+            <div class="tag">灵宠出战可极大提升战力</div>
+          </div>
+          <div class="stat-row"><span class="stat-label">出战灵宠</span><span class="stat-value" id="active-pet-text"></span></div>
+          <div class="pet-list" id="pet-list"></div>
+        </div>
+      </section>
+
+      <!-- 试炼之塔 -->
+      <section id="page-tower" class="page">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">试炼之塔</div>
+            <div class="tag">层数越高，试炼越残酷</div>
+          </div>
+          <div class="stat-row"><span class="stat-label">当前最高层</span><span class="stat-value" id="tower-max-floor">0</span></div>
+          <div class="stat-row"><span class="stat-label">正在挑战层</span><span class="stat-value" id="tower-cur-floor">0</span></div>
+          <p class="small-label">试炼之塔为单次手动挑战，不受挂机节奏影响。失败不会死亡，但也无任何奖励。</p>
+          <div class="btn-row" style="margin-top:4px;">
+            <button id="btn-tower-next" class="small primary">挑战下一层</button>
+            <button id="btn-tower-repeat" class="small">重打当前层</button>
+          </div>
+          <div id="tower-log" class="tower-log" style="margin-top:6px;"></div>
+        </div>
+      </section>
+
+      <!-- 转生重修 -->
+      <section id="page-rebirth" class="page">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">转生重修</div>
+            <div class="tag">以放弃当前修为换取永恒加成</div>
+          </div>
+          <div class="stat-row"><span class="stat-label">已转生次数</span><span class="stat-value" id="rebirth-count">0</span></div>
+          <div class="stat-row"><span class="stat-label">悟道点</span><span class="stat-value" id="rebirth-soul">0</span></div>
+          <p class="small-label">
+            至少达到「大乘·初」后方可转生。<br>
+            转生会清空当前境界、灵石、装备、材料、宗门、灵宠等大部分内容。<br>
+            但会保留「悟道点」，提供永久攻击、防御与灵气获取加成。<br>
+            适合在高境界瓶颈、渡劫屡屡失败时选择。
+          </p>
+          <div class="stat-row"><span class="stat-label">当前悟道加成</span><span class="stat-value" id="rebirth-bonus-text"></span></div>
+          <div class="btn-row" style="margin-top:4px;">
+            <button id="btn-rebirth-do" class="danger small">立即转生重修</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 万宝阁 -->
+      <section id="page-shop" class="page">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">万宝阁</div>
+            <div class="tag">以灵石购买丹药与秘卷</div>
+          </div>
+          <div class="item-list" id="shop-list"></div>
+        </div>
+      </section>
+
+      <!-- 统计成就 -->
+      <section id="page-stats" class="page">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">统计与成就</div>
+            <div class="tag">回顾你的修行轨迹</div>
+          </div>
+          <div class="stat-row"><span class="stat-label">累计击杀</span><span class="stat-value" id="stat-kill"></span></div>
+          <div class="stat-row"><span class="stat-label">精英击杀</span><span class="stat-value" id="stat-elite"></span></div>
+          <div class="stat-row"><span class="stat-label">首领击杀</span><span class="stat-value" id="stat-boss"></span></div>
+          <div class="stat-row"><span class="stat-label">战斗失败次数</span><span class="stat-value" id="stat-death"></span></div>
+          <div class="stat-row"><span class="stat-label">突破次数</span><span class="stat-value" id="stat-break"></span></div>
+          <div class="stat-row"><span class="stat-label">锻造次数</span><span class="stat-value" id="stat-forge"></span></div>
+          <div class="stat-row"><span class="stat-label">收服灵宠数量</span><span class="stat-value" id="stat-pets"></span></div>
+          <div class="stat-row"><span class="stat-label">完成宗门任务</span><span class="stat-value" id="stat-sect"></span></div>
+          <div class="stat-row"><span class="stat-label">最高试炼之塔层数</span><span class="stat-value" id="stat-tower"></span></div>
+        </div>
+      </section>
+
+      <!-- 修道日志 -->
+      <section id="page-log" class="page">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">修道日志</div>
+            <div class="tag">记录你的每一次机缘与挫折</div>
+          </div>
+          <div id="global-log" class="log"></div>
+        </div>
+      </section>
+    </div>
+
+    <!-- 右侧：装备可视化 + 灵宠简表等 -->
     <div>
       <div class="panel">
         <div class="panel-header">
-          <div class="panel-title">角色信息</div>
-          <div class="tag">散修起步，可入宗门</div>
+          <div class="panel-title">装备一览</div>
+          <div class="tag">当前已穿戴法器</div>
         </div>
-        <div class="stat-row"><span class="stat-label">道号</span><span class="stat-value" id="role-name">凡尘一修</span></div>
-        <div class="stat-row"><span class="stat-label">境界</span><span class="stat-value" id="realmName"></span></div>
-        <div class="stat-row"><span class="stat-label">灵根资质</span><span class="stat-value" id="rootDesc"></span></div>
-        <div class="stat-row"><span class="stat-label">所属宗门</span><span class="stat-value" id="home-sect-name">无</span></div>
-        <div class="stat-row"><span class="stat-label">突破次数</span><span class="stat-value" id="stat-break">0</span></div>
-
-        <div style="margin-top:6px;">
-          <div class="stat-row"><span class="stat-label">气血</span><span class="stat-value"><span id="hpNow"></span>/<span id="hpMax"></span></span></div>
-          <div class="bar"><div class="bar-fill hp" id="hpBar"></div></div>
-          <div class="stat-row"><span class="stat-label">真气</span><span class="stat-value"><span id="mpNow"></span>/<span id="mpMax"></span></span></div>
-          <div class="bar"><div class="bar-fill mp" id="mpBar"></div></div>
-          <div class="stat-row"><span class="stat-label">境界灵气</span><span class="stat-value"><span id="qiNow"></span>/<span id="qiNeed"></span></span></div>
-          <div class="bar"><div class="bar-fill xp" id="xpBar"></div></div>
-        </div>
-        <div class="row" style="margin-top:4px;">
-          <button class="small primary" id="btn-break">突破小境界</button>
-          <span class="pill">击败怪物自动回满气血真气，失败仅无奖励但不断战。</span>
-        </div>
+        <div class="equip-grid" id="equip-slots-mini"></div>
       </div>
-
       <div class="panel">
         <div class="panel-header">
-          <div class="panel-title">基础属性（自动成长）</div>
-          <div class="tag">突破时根据体修/剑修/悟性自动分配</div>
+          <div class="panel-title">灵宠概况</div>
+          <div class="tag">出战灵宠及其攻击加成</div>
         </div>
-        <div class="attr-grid">
-          <div class="attr-cell">
-            <span>力道</span>
-            <span><span id="attr-str">0</span>
-              <button class="attr-btn" data-add-attr="str">+</button>
-            </span>
-          </div>
-          <div class="attr-cell">
-            <span>体魄</span>
-            <span><span id="attr-vit">0</span>
-              <button class="attr-btn" data-add-attr="vit">+</button>
-            </span>
-          </div>
-          <div class="attr-cell">
-            <span>身法</span>
-            <span><span id="attr-agi">0</span>
-              <button class="attr-btn" data-add-attr="agi">+</button>
-            </span>
-          </div>
-          <div class="attr-cell">
-            <span>悟性</span>
-            <span><span id="attr-wis">0</span>
-              <button class="attr-btn" data-add-attr="wis">+</button>
-            </span>
-          </div>
-        </div>
-        <div class="stat-row" style="margin-top:4px;">
-          <span class="stat-label">可分配属性点</span>
-          <span class="stat-value" id="attr-free">0</span>
-        </div>
-        <div style="margin-top:6px;">
-          <div class="stat-row"><span class="stat-label">攻击力</span><span class="stat-value" id="stat-atk">0</span></div>
-          <div class="stat-row"><span class="stat-label">防御力</span><span class="stat-value" id="stat-def">0</span></div>
-          <div class="stat-row"><span class="stat-label">暴击率</span><span class="stat-value" id="stat-crit">0%</span></div>
-          <div class="stat-row"><span class="stat-label">挂机灵气效率</span><span class="stat-value" id="stat-afk">100%</span></div>
-        </div>
+        <div class="stat-row"><span class="stat-label">出战灵宠</span><span class="stat-value" id="active-pet-text-mini"></span></div>
+        <div class="stat-row"><span class="stat-label">灵宠总攻击</span><span class="stat-value" id="active-pet-atk"></span></div>
       </div>
-
       <div class="panel">
         <div class="panel-header">
-          <div class="panel-title">神通与心法（完整）</div>
-          <div class="tag">最多同时启用 4 条，高阶神通需秘卷或宗门解锁</div>
+          <div class="panel-title">小贴士</div>
+          <div class="tag">不同玩法的简单建议</div>
         </div>
-        <div id="skill-list" class="equip-list"></div>
+        <p class="small-label">
+          · 地图越靠后怪物越强，建议按照推荐境界稳扎稳打。<br>
+          · 渡劫阶段有失败惩罚，失败会被天劫劈走一半当前灵气。<br>
+          · 试炼之塔可获得悟道点，为转生提供强大助力。<br>
+          · 转生前尽量多突破、多爬塔，下一世会轻松许多。
+        </p>
       </div>
     </div>
-
-    <!-- 中：地图与战斗 -->
-    <div>
-      <div class="panel">
-        <div class="panel-header">
-          <div class="panel-title">当前挂机状态</div>
-          <div class="tag">无限挂机：失败不会中断，仅本场无收益</div>
-        </div>
-        <div class="stat-row">
-          <span class="stat-label">当前地图</span>
-          <span class="stat-value" id="cur-map-name">无</span>
-        </div>
-        <div class="stat-row">
-          <span class="stat-label">战斗节奏</span>
-          <span class="stat-value small-label">约每 1 秒进行一场战斗结算</span>
-        </div>
-        <div class="row" style="margin-top:4px;">
-          <button class="small primary" id="btn-start">开始挂机</button>
-          <button class="small" id="btn-stop">停止挂机</button>
-          <span class="pill">建议先在「灵域地图」中选择一张地图。</span>
-        </div>
-        <div style="margin-top:6px;">
-          <div class="stat-row"><span class="stat-label">总击杀</span><span class="stat-value" id="stat-kill">0</span></div>
-          <div class="stat-row"><span class="stat-label">精英击杀</span><span class="stat-value" id="stat-elite">0</span></div>
-          <div class="stat-row"><span class="stat-label">首领击杀</span><span class="stat-value" id="stat-boss">0</span></div>
-          <div class="stat-row"><span class="stat-label">阵亡次数</span><span class="stat-value" id="stat-death">0</span></div>
-        </div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-header">
-          <div class="panel-title">战斗记录</div>
-          <div class="tag">只显示最近若干条战况</div>
-        </div>
-        <div id="battle-log" class="log"></div>
-      </div>
-    </div>
-
-    <!-- 右：装备 + 灵宠 + 快捷操作 -->
-    <div>
-      <div class="panel">
-        <div class="panel-header">
-          <div class="panel-title">当前装备</div>
-          <div class="tag">本版无强化，只靠掉落与锻造换装</div>
-        </div>
-        <div class="stat-row"><span class="stat-label">武器</span><span class="stat-value" id="equip-weapon">未装备</span></div>
-        <div class="stat-row"><span class="stat-label">护甲</span><span class="stat-value" id="equip-armor">未装备</span></div>
-        <div class="stat-row"><span class="stat-label">头冠</span><span class="stat-value" id="equip-head">未装备</span></div>
-        <div class="stat-row"><span class="stat-label">项链</span><span class="stat-value" id="equip-neck">未装备</span></div>
-        <div class="stat-row"><span class="stat-label">戒指</span><span class="stat-value" id="equip-ring">未装备</span></div>
-        <div class="stat-row"><span class="stat-label">腰带</span><span class="stat-value" id="equip-belt">未装备</span></div>
-        <div class="stat-row"><span class="stat-label">靴子</span><span class="stat-value" id="equip-boot">未装备</span></div>
-        <div class="stat-row"><span class="stat-label">法宝</span><span class="stat-value" id="equip-relic">未装备</span></div>
-        <div id="equip-visual">
-          <div class="slot-cell"><div class="slot-name">武器</div><div class="slot-item" id="vis-weapon">—</div></div>
-          <div class="slot-cell"><div class="slot-name">护甲</div><div class="slot-item" id="vis-armor">—</div></div>
-          <div class="slot-cell"><div class="slot-name">头冠</div><div class="slot-item" id="vis-head">—</div></div>
-          <div class="slot-cell"><div class="slot-name">项链</div><div class="slot-item" id="vis-neck">—</div></div>
-          <div class="slot-cell"><div class="slot-name">戒指</div><div class="slot-item" id="vis-ring">—</div></div>
-          <div class="slot-cell"><div class="slot-name">腰带</div><div class="slot-item" id="vis-belt">—</div></div>
-          <div class="slot-cell"><div class="slot-name">靴子</div><div class="slot-item" id="vis-boot">—</div></div>
-          <div class="slot-cell"><div class="slot-name">法宝</div><div class="slot-item" id="vis-relic">—</div></div>
-          <div class="slot-cell"><div class="slot-name">灵宠攻击加成</div><div class="slot-item" id="vis-pet">无</div></div>
-        </div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-header">
-          <div class="panel-title">灵宠概览</div>
-          <div class="tag">精英 / 首领战有概率收服灵宠</div>
-        </div>
-        <div class="stat-row"><span class="stat-label">当前出战</span><span class="stat-value" id="pet-active">无</span></div>
-        <div id="pet-mini-list" class="equip-list"></div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-header">
-          <div class="panel-title">快捷操作</div>
-          <div class="tag">一键出售按品质法器</div>
-        </div>
-        <div class="row">
-          <button class="small" data-sellq="0">出售粗制及以下</button>
-          <button class="small" data-sellq="1">出售普通及以下</button>
-          <button class="small" data-sellq="2">出售良品及以下</button>
-        </div>
-        <p class="small-label" style="margin-top:4px;">仅出售未装备法器，灵石获取主要来自卖装备，数值整体偏难。</p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- 灵域地图 -->
-<div id="page-map" class="page">
-  <div class="panel">
-    <div class="panel-header">
-      <div class="panel-title">灵域地图一览</div>
-      <div class="tag">共十张地图，越后面危险越高，掉落越好</div>
-    </div>
-    <table class="simple">
-      <thead><tr><th>名称</th><th>推荐境界</th><th>危险度</th><th>主要掉落</th><th>操作</th></tr></thead>
-      <tbody id="map-table-body"></tbody>
-    </table>
-  </div>
-  <div class="panel">
-    <div class="panel-header">
-      <div class="panel-title">系统日志（地图相关）</div>
-      <div class="tag">显示最近地图切换 / 掉落 / 特殊事件</div>
-    </div>
-    <div id="system-log" class="log"></div>
-  </div>
-</div>
-
-<!-- 法器仓库 -->
-<div id="page-warehouse" class="page">
-  <div class="panel">
-    <div class="panel-header">
-      <div class="panel-title">法器仓库</div>
-      <div class="tag" id="warehouse-cap">容量：0 件</div>
-    </div>
-    <div class="row" style="margin-bottom:4px;">
-      <span class="filter-label">按部位：</span>
-      <div class="filter-group" id="filter-slot-group"></div>
-    </div>
-    <div class="row" style="margin-bottom:4px;">
-      <span class="filter-label">按品质：</span>
-      <div class="filter-group" id="filter-quality-group"></div>
-    </div>
-    <div class="row" style="margin-bottom:4px;">
-      <span class="filter-label">按属性：</span>
-      <div class="filter-group" id="filter-ele-group"></div>
-    </div>
-    <div class="row" style="margin-bottom:4px;">
-      <button class="small" id="btn-sell-all">一键出售所有未装备法器</button>
-    </div>
-    <div id="warehouse-list" class="equip-list"></div>
-  </div>
-</div>
-
-<!-- 百宝袋 -->
-<div id="page-bag" class="page">
-  <div class="panel">
-    <div class="panel-header">
-      <div class="panel-title">百宝袋</div>
-      <div class="tag" id="bag-cap">物品种类：0</div>
-    </div>
-    <div class="row" style="margin-bottom:4px;">
-      <span class="filter-label">按类型：</span>
-      <div class="filter-group" id="bag-type-group"></div>
-    </div>
-    <div class="row" style="margin-bottom:4px;">
-      <span class="filter-label">按品质：</span>
-      <div class="filter-group" id="bag-quality-group"></div>
-    </div>
-    <div class="row" style="margin-bottom:4px;">
-      <button class="small" id="btn-bag-sort">整理百宝袋</button>
-      <span class="small-label">本版没有“翻找旧物”“白嫖材料”等按钮，一切材料全靠打。</span>
-    </div>
-    <div id="bag-list" class="item-list"></div>
-  </div>
-</div>
-
-<!-- 锻造炉 -->
-<div id="page-forge" class="page">
-  <div class="panel">
-    <div class="panel-header">
-      <div class="panel-title">玄天锻造炉</div>
-      <div class="tag">消耗材料与灵石，锻造各类法器</div>
-    </div>
-    <p class="small-label">不同配方对境界有推荐要求，越后期配方越强，所需材料越多。</p>
-    <table class="simple">
-      <thead><tr><th>配方</th><th>需求材料</th><th>需求境界</th><th>效果</th><th>操作</th></tr></thead>
-      <tbody id="forge-table-body"></tbody>
-    </table>
-  </div>
-  <div class="panel">
-    <div class="panel-header">
-      <div class="panel-title">现有材料统计</div>
-      <div class="tag">仅显示常用锻造材料</div>
-    </div>
-    <div id="forge-mat-list" class="item-list"></div>
-  </div>
-</div>
-
-<!-- 十大宗门 -->
-<div id="page-sect" class="page">
-  <div class="panel">
-    <div class="panel-header">
-      <div class="panel-title">选择宗门</div>
-      <div class="tag">十大仙宗，各有加成，仅能加入一个</div>
-    </div>
-    <table class="simple">
-      <thead><tr><th>宗门</th><th>简介与加成</th><th>操作</th></tr></thead>
-      <tbody id="sect-table-body"></tbody>
-    </table>
-  </div>
-  <div class="panel">
-    <div class="panel-header">
-      <div class="panel-title">宗门信息 · 任务 · 宝库</div>
-      <div class="tag">宗门贡献：<span id="sect-contrib">0</span></div>
-    </div>
-    <div class="stat-row"><span class="stat-label">当前宗门</span><span class="stat-value" id="sect-name">未加入</span></div>
-    <div class="stat-row"><span class="stat-label">门内评价</span><span class="stat-value" id="sect-title">无</span></div>
-    <h4 class="small-label">宗门任务（完成后可领取贡献，领取后系统会自动刷新新任务）</h4>
-    <div id="sect-task-list" class="item-list"></div>
-    <h4 class="small-label">宗门宝库（兑换需要贡献，且部分物品需要境界条件）</h4>
-    <div id="sect-shop-list" class="item-list"></div>
-  </div>
-</div>
-
-<!-- 灵宠园 -->
-<div id="page-pets" class="page">
-  <div class="panel">
-    <div class="panel-header">
-      <div class="panel-title">灵宠园</div>
-      <div class="tag">精英 / 首领战概率出现灵宠，捕获后可在此管理</div>
-    </div>
-    <div class="stat-row"><span class="stat-label">出战灵宠</span><span class="stat-value" id="pets-active-name">无</span></div>
-    <div class="stat-row"><span class="stat-label">灵宠总数</span><span class="stat-value" id="pets-count">0</span></div>
-    <div id="pets-list" class="item-list"></div>
-  </div>
-</div>
-
-<!-- 万宝阁 -->
-<div id="page-shop" class="page">
-  <div class="panel">
-    <div class="panel-header">
-      <div class="panel-title">万宝阁 · 丹药与宝物</div>
-      <div class="tag">当前灵石：<span id="shop-gold">0</span></div>
-    </div>
-    <p class="small-label">部分高阶丹药需要更高境界才可购买，例如提高灵根的「洗髓伐骨丹」。</p>
-    <div id="shop-list" class="item-list"></div>
-  </div>
-</div>
-
-<!-- 成就与统计 -->
-<div id="page-stats" class="page">
-  <div class="panel">
-    <div class="panel-header">
-      <div class="panel-title">修炼统计</div>
-      <div class="tag">单机本地存档，主要展示当前周目数据</div>
-    </div>
-    <table class="simple">
-      <tbody>
-        <tr><th>总击杀</th><td id="st-kill">0</td></tr>
-        <tr><th>精英击杀</th><td id="st-elite">0</td></tr>
-        <tr><th>首领击杀</th><td id="st-boss">0</td></tr>
-        <tr><th>阵亡次数</th><td id="st-death">0</td></tr>
-        <tr><th>突破次数</th><td id="st-bt">0</td></tr>
-        <tr><th>收服灵宠数</th><td id="st-pet">0</td></tr>
-        <tr><th>完成宗门任务数</th><td id="st-sect-task">0</td></tr>
-        <tr><th>锻造次数</th><td id="st-forge">0</td></tr>
-      </tbody>
-    </table>
-  </div>
-</div>
-
-<!-- 修道日志 -->
-<div id="page-log" class="page">
-  <div class="panel">
-    <div class="panel-header">
-      <div class="panel-title">修道大事记</div>
-      <div class="tag">记录突破、宗门、灵宠、重要掉落等</div>
-    </div>
-    <div id="global-log" class="log"></div>
-  </div>
+  </main>
 </div>
 
 <script>
-/*********** 常量：境界 / 地图 / 品质 / 神通 / 物品 / 宗门 ***********/
+const SAVE_KEY = 'xuanyu-idle-v4';
+const TICK_MS = 400;
+const BATTLE_INTERVAL = 2000;
+
 const REALM_STEPS = [
   {name:'凡人', qi:50},
   {name:'炼气·初', qi:180},
@@ -547,133 +675,189 @@ const REALM_STEPS = [
 ];
 
 const MAPS = [
-  {id:0, name:'云岚村外',      req:1, danger:1, gold:3,  qi:4,  loot:'粗制装备 / 玄铁矿'},
-  {id:1, name:'青松山猎场',    req:2, danger:1, gold:4,  qi:6,  loot:'普通装备 / 玄铁矿 / 赤金矿'},
-  {id:2, name:'流沙火荒',      req:4, danger:2, gold:6,  qi:10, loot:'良品装备 / 火灵石 / 赤金矿'},
-  {id:3, name:'千幻林海',      req:6, danger:2, gold:8,  qi:15, loot:'良品 / 上品装备 / 木灵髓'},
-  {id:4, name:'幽冥沼泽',      req:8, danger:3, gold:10, qi:20, loot:'上品装备 / 阴煞之骨'},
-  {id:5, name:'烈焰谷',        req:10,danger:3, gold:12, qi:26, loot:'上品 / 绝品装备 / 火焰晶核'},
-  {id:6, name:'万妖洞天外围',  req:13,danger:4, gold:15, qi:34, loot:'绝品装备 / 妖丹 / 稀有材料'},
-  {id:7, name:'万妖洞天深处',  req:16,danger:4, gold:18, qi:42, loot:'灵宝雏形 / 高阶材料'},
-  {id:8, name:'魔裂前线',      req:20,danger:5, gold:22, qi:55, loot:'灵宝级装备 / 魔核'},
-  {id:9, name:'登天劫峰',      req:24,danger:6, gold:28, qi:70, loot:'渡劫材料 / 顶级法宝'}
+  {id:1, name:'云岚村外', qi:150, diff:1, drops:'粗制装备、少量材料、低阶丹药', recommend:'炼气·中'},
+  {id:2, name:'青石山道', qi:450, diff:2, drops:'普通装备、玄铁矿、低阶灵宠', recommend:'炼气·后'},
+  {id:3, name:'乱石荒岭', qi:900, diff:3, drops:'良品装备、赤金矿、基础秘卷', recommend:'筑基·中'},
+  {id:4, name:'幽风密林', qi:1800, diff:4, drops:'上品装备、木灵髓、妖丹', recommend:'结丹·初'},
+  {id:5, name:'血月沼泽', qi:3500, diff:5, drops:'绝品装备、火焰晶核、精英灵宠', recommend:'结丹·后'},
+  {id:6, name:'玄冥冰原', qi:6500, diff:6, drops:'灵宝胚子、高阶材料、稀有秘卷', recommend:'元婴·中'},
+  {id:7, name:'千刃峡谷', qi:11000, diff:7, drops:'高阶灵宝、珍稀灵宠、宗门令牌', recommend:'化神·初'},
+  {id:8, name:'幽魂古战场', qi:20000, diff:8, drops:'战魂法器、阴煞之骨、特殊秘卷', recommend:'炼虚·中'},
+  {id:9, name:'太虚雷渊', qi:40000, diff:9, drops:'雷系灵宝、渡劫材料、妖王幼崽', recommend:'合体·后'},
+  {id:10, name:'登天劫峰', qi:90000, diff:10, drops:'顶级灵宝、渡劫灵材、极稀有灵宠', recommend:'大乘·后 ~ 渡劫'}
 ];
 
-const GEAR_SLOTS = [
-  {id:'weapon', label:'武器'},
-  {id:'armor',  label:'护甲'},
-  {id:'head',   label:'头冠'},
-  {id:'neck',   label:'项链'},
-  {id:'ring',   label:'戒指'},
-  {id:'belt',   label:'腰带'},
-  {id:'boot',   label:'靴子'},
-  {id:'relic',  label:'法宝'}
+const EQUIP_SLOTS = [
+  {id:'weapon', name:'武器'},
+  {id:'armor',  name:'护甲'},
+  {id:'head',   name:'头冠'},
+  {id:'neck',   name:'项链'},
+  {id:'ring',   name:'戒指'},
+  {id:'belt',   name:'腰带'},
+  {id:'boots',  name:'靴子'},
+  {id:'treasure', name:'法宝'}
 ];
 
-const ELEMENTS = ['金','木','水','火','土','雷','冰','风'];
-
-const QUALITIES = ['粗制','普通','良品','上品','绝品','灵宝','秘宝'];
-
-const SKILLS = [
-  {id:'basicAura', name:'吐纳·入定',  desc:'挂机境界灵气+15%。',      req:1, type:'qiMul', value:0.15, source:'start'},
-  {id:'sword1',    name:'剑势·破云',  desc:'攻击+12%。',             req:4, type:'atkMul', value:0.12, source:'scroll'},
-  {id:'body1',     name:'锻体·铜骨',  desc:'防御+16%。',             req:5, type:'defMul', value:0.16, source:'scroll'},
-  {id:'mind1',     name:'心境·宁神',  desc:'挂机灵气再+20%。',       req:6, type:'qiMul',  value:0.20, source:'sect'},
-  {id:'speed1',    name:'身法·逐电',  desc:'战斗效率稍微加快。',     req:6, type:'speed',  value:0.10, source:'sect'},
-  {id:'crit1',     name:'杀意·锐锋',  desc:'暴击率+5%。',            req:7, type:'crit',   value:0.05, source:'scroll'},
-  {id:'hp1',       name:'养生·归元',  desc:'气血上限+18%。',         req:8, type:'hpMul',  value:0.18, source:'sect'},
-  {id:'shield1',   name:'护体灵光',   desc:'部分削减怪物攻击。',     req:9, type:'dmgRed', value:0.10, source:'sect'}
-];
-
-const BAG_TYPES = [
-  {id:'pill',  name:'丹药'},
-  {id:'mat',   name:'材料'},
-  {id:'scroll',name:'秘卷'},
-  {id:'other', name:'其他'}
-];
-
-const BAG_ITEMS_DEF = [
-  {id:'hpPill',   name:'回元丹',        type:'pill',  quality:2, desc:'回复气血到上限。', effect:'hpFull'},
-  {id:'qiSmall',  name:'小聚灵丹',     type:'pill',  quality:2, desc:'增加 80 点境界灵气。', effect:'qi', amount:80},
-  {id:'qiMid',    name:'中品聚灵丹',   type:'pill',  quality:3, desc:'增加 260 点境界灵气。', effect:'qi', amount:260},
-  {id:'rootPill', name:'洗髓伐骨丹',   type:'pill',  quality:4, desc:'永久提升 1 点灵根资质（上限 15）。', effect:'rootUp', amount:1},
-  {id:'oreIron',  name:'玄铁矿',        type:'mat',   quality:1, desc:'最基础的锻造材料。', effect:null},
-  {id:'oreGold',  name:'赤金矿',        type:'mat',   quality:2, desc:'可打造较好的兵器。', effect:null},
-  {id:'oreWood',  name:'木灵髓',        type:'mat',   quality:2, desc:'用于法宝与饰品的灵材。', effect:null},
-  {id:'oreFire',  name:'火焰晶核',      type:'mat',   quality:3, desc:'蕴含火焰之力的核心。', effect:null},
-  {id:'oreDark',  name:'阴煞之骨',      type:'mat',   quality:3, desc:'幽冥之地的残骸，可炼兵。', effect:null},
-  {id:'oreDemon', name:'妖丹',          type:'mat',   quality:4, desc:'强大妖兽的内丹，用于高阶锻造。', effect:null},
-  {id:'skillSword', name:'剑势秘卷',   type:'scroll',quality:3, desc:'参悟后可解锁神通「剑势·破云」。', effect:'unlockSkill', skillId:'sword1'},
-  {id:'skillBody',  name:'锻体秘卷',   type:'scroll',quality:3, desc:'参悟后可解锁「锻体·铜骨」。', effect:'unlockSkill', skillId:'body1'},
-  {id:'skillCrit',  name:'杀意秘卷',   type:'scroll',quality:4, desc:'参悟后可解锁「杀意·锐锋」。', effect:'unlockSkill', skillId:'crit1'}
+const QUALITY = [
+  {id:1, name:'粗制'},
+  {id:2, name:'普通'},
+  {id:3, name:'良品'},
+  {id:4, name:'上品'},
+  {id:5, name:'绝品'},
+  {id:6, name:'灵宝'}
 ];
 
 const SECTS = [
-  {id:'qingyun', name:'青云剑宗', desc:'剑修正宗，专精杀伐。攻击+12%，暴击率+4%。', effects:{atkMul:0.12, crit:0.04}},
-  {id:'tiangu',  name:'天罡战殿', desc:'体修重甲，肉身无双。防御+18%，生命+10%。', effects:{defMul:0.18, hpMul:0.10}},
-  {id:'bicao',   name:'百草丹谷', desc:'丹道圣地，丹香不绝。挂机灵气+25%，丹药效果略微提升。', effects:{qiMul:0.25, pillBonus:0.2}},
-  {id:'xuanyin', name:'玄音仙宫', desc:'心法流派，注重神识。真气上限+30%。', effects:{mpMul:0.30}},
-  {id:'luanxing',name:'乱星海阁', desc:'游侠云集，攻守平衡。攻击+6%，防御+6%。', effects:{atkMul:0.06, defMul:0.06}},
-  {id:'xuanwu',  name:'玄武体修殿', desc:'极致防守，万法不侵。防御+24%。', effects:{defMul:0.24}},
-  {id:'anying',  name:'暗影楼',   desc:'刺杀宗门，出手必见血。暴击率+8%。', effects:{crit:0.08}},
-  {id:'lei',     name:'天雷宗',   desc:'雷法轰鸣，攻势凌厉。攻击+10%。', effects:{atkMul:0.10}},
-  {id:'xianhe',  name:'栖霞仙阁', desc:'仙道悠远，五行平衡。生命+8%，攻击+5%。', effects:{hpMul:0.08, atkMul:0.05}},
-  {id:'mo',      name:'太玄魔宗', desc:'以杀证道，风险极高。攻击+18%，防御-10%。', effects:{atkMul:0.18, defMul:-0.10}}
+  {id:'qingyun', name:'青云剑宗', desc:'主修剑道，攻势凌厉。', bonus:{atk:0.15, crit:0.04}},
+  {id:'tiangang', name:'天罡战殿', desc:'以力破巧，重视体魄防御。', bonus:{atk:0.05, def:0.2, hp:0.12}},
+  {id:'baicao', name:'百草丹谷', desc:'丹道昌隆，灵气汇聚。', bonus:{qi:0.25}},
+  {id:'anying', name:'暗影楼', desc:'行走于暗处的一击必杀之道。', bonus:{crit:0.08}},
+  {id:'taixu', name:'太玄魔宗', desc:'以伤换伤的极端流派。', bonus:{atk:0.2, def:-0.1}},
+  {id:'lingxiao', name:'凌霄仙宫', desc:'平衡而稳健的仙道宗门。', bonus:{atk:0.08, def:0.08, qi:0.08}},
+  {id:'zhenwu', name:'真武道院', desc:'刚柔并济，重视基础根骨。', bonus:{hp:0.1, def:0.12}},
+  {id:'luanxing', name:'乱星海阁', desc:'擅长控制与身法。', bonus:{agi:2}},
+  {id:'canglong', name:'苍龙古族', desc:'肉身强横，力拔山河。', bonus:{str:3, hp:0.08}},
+  {id:'tianji', name:'天机楼', desc:'洞察天机，善于谋算。', bonus:{wis:3, qi:0.1}}
 ];
 
+// 不包含收服灵宠任务
 const SECT_TASK_TEMPLATES = [
   {id:'kill50',   type:'kill',  need:50,  desc:'击杀 50 个怪物',          reward:60},
   {id:'killElite',type:'elite', need:20,  desc:'击杀 20 个精英怪',        reward:140},
   {id:'killBoss', type:'boss',  need:8,   desc:'击杀 8 个首领怪',         reward:260},
   {id:'forge10',  type:'forge', need:10,  desc:'进行 10 次锻造',          reward:180},
-  {id:'pet3',     type:'pet',   need:3,   desc:'收服 3 只灵宠',           reward:220},
   {id:'realm12',  type:'realm', need:12,  desc:'境界达到「元婴·后」',     reward:260},
   {id:'realm20',  type:'realm', need:20,  desc:'境界达到「合体·中」',     reward:420}
 ];
 
-const SECT_SHOP_ITEMS = [
-  {id:'sectSword', name:'宗门长剑', desc:'品质良品的长剑，适合前期剑修弟子。', cost:200, realmReq:4,
-   make:function(){return makeGear('上品长剑','weapon',3,40,4);}},
-  {id:'sectArmor', name:'宗门战甲', desc:'品质良品的战甲，增强防御。', cost:200, realmReq:5,
-   make:function(){return makeGear('宗门战甲','armor',3,8,45);}},
-  {id:'sectRelic', name:'内门法宝·玄星轮', desc:'宗门内门弟子专用法宝。', cost:480, realmReq:8,
-   make:function(){return makeGear('玄星轮','relic',4,90,20);}},
-  {id:'sectPetEgg', name:'灵兽蛋', desc:'可孵化一只随机灵宠。', cost:360, realmReq:6,
-   make:function(){return {type:'petEgg'};}}
+const FORGE_RECIPES = [
+  {id:'iron_sword', name:'玄铁长剑', slot:'weapon', quality:3, atk:22, def:0, need:[
+    {id:'mat_iron', name:'玄铁矿', qty:6}
+  ], gold:120},
+  {id:'iron_armor', name:'玄铁软甲', slot:'armor', quality:3, atk:0, def:18, need:[
+    {id:'mat_iron', name:'玄铁矿', qty:6}
+  ], gold:120},
+  {id:'fire_wheel', name:'烈焰法轮', slot:'treasure', quality:4, atk:40, def:5, need:[
+    {id:'mat_fire', name:'火焰晶核', qty:4},
+    {id:'mat_iron', name:'玄铁矿', qty:6}
+  ], gold:260},
+  {id:'frozen_boot', name:'玄冥寒靴', slot:'boots', quality:4, atk:8, def:16, need:[
+    {id:'mat_ice', name:'寒冰灵髓', qty:4}
+  ], gold:200}
 ];
 
 const SHOP_ITEMS = [
-  {id:'shopHp',   ref:'hpPill',  price:80,  realmReq:1},
-  {id:'shopQiS',  ref:'qiSmall', price:60,  realmReq:1},
-  {id:'shopQiM',  ref:'qiMid',   price:180, realmReq:4},
-  {id:'shopRoot', ref:'rootPill',price:520, realmReq:6},
-  {id:'shopSwordScroll', ref:'skillSword', price:260, realmReq:4},
-  {id:'shopBodyScroll',  ref:'skillBody',  price:260, realmReq:5},
-  {id:'shopCritScroll',  ref:'skillCrit',  price:420, realmReq:7}
+  {id:'pill_hp_small', name:'回元丹', type:'pill', effect:'hp', amount:0.3, price:30, desc:'立即恢复 30% 气血。'},
+  {id:'pill_qi_small', name:'聚灵丹', type:'pill', effect:'qi', amount:200, price:50, desc:'获得 200 点境界灵气。'},
+  {id:'pill_root', name:'洗髓伐骨丹', type:'root', effect:'root', amount:1, price:260, needRealm:8, desc:'永久提升 1 点灵根，上限 15。'},
+  {id:'scroll_sword', name:'剑势秘卷', type:'scroll', effect:'skill_sword', amount:1, price:220, desc:'解锁神通「剑势·破云」。'}
 ];
 
-/*********** 游戏状态 ***********/
-let game = null;
+let game=null;
+let battleCooldown=0;
 
+// 小工具
+function randInt(max){
+  return Math.floor(Math.random()*max);
+}
+function randChoice(arr){
+  return arr[Math.floor(Math.random()*arr.length)];
+}
+function realmName(index){
+  if(index<0) return REALM_STEPS[0].name;
+  if(index>=REALM_STEPS.length) return REALM_STEPS[REALM_STEPS.length-1].name;
+  return REALM_STEPS[index].name;
+}
+function getRealmObj(){
+  return REALM_STEPS[game.player.realmIndex] || REALM_STEPS[REALM_STEPS.length-1];
+}
+function addGlobalLog(text, cls){
+  const box=document.getElementById('global-log');
+  if(!box) return;
+  const p=document.createElement('p');
+  p.textContent=text;
+  p.className=cls||'sys';
+  box.appendChild(p);
+  while(box.childNodes.length>200) box.removeChild(box.firstChild);
+  box.scrollTop=box.scrollHeight;
+}
+function addBattleLog(text, cls){
+  const box=document.getElementById('battle-log');
+  if(!box) return;
+  const p=document.createElement('p');
+  p.textContent=text;
+  p.className=cls||'sys';
+  box.appendChild(p);
+  while(box.childNodes.length>120) box.removeChild(box.firstChild);
+  box.scrollTop=box.scrollHeight;
+}
+function addTowerLog(text){
+  const box=document.getElementById('tower-log');
+  if(!box) return;
+  const p=document.createElement('p');
+  p.textContent=text;
+  box.appendChild(p);
+  while(box.childNodes.length>120) box.removeChild(box.firstChild);
+  box.scrollTop=box.scrollHeight;
+}
+
+// 转生加成
+function getRebirthBonus(){
+  if(!game || !game.rebirth) return {atkMul:1,defMul:1,qiMul:1,level:0};
+  const level = game.rebirth.count + game.rebirth.soul;
+  const atkMul = 1 + level * 0.03;
+  const defMul = 1 + level * 0.02;
+  const qiMul  = 1 + level * 0.03;
+  return {atkMul,defMul,qiMul,level};
+}
+
+// 默认存档
 function defaultGame(){
   return {
     player:{
-      name:'凡尘一修',
+      name:'无名散修',
       realmIndex:0,
-      qi:0,
+      level:1,
+      root:5,
+      attrs:{str:3,vit:3,agi:3,wis:3},
+      freePoints:0,
       hp:100,
       hpMax:100,
       mp:50,
       mpMax:50,
       atk:10,
-      def:4,
-      root:8,
-      attrs:{str:3, vit:3, agi:3, wis:3},
-      freePoints:0,
+      def:5,
+      critRate:0.05,
       gold:0,
-      knownSkills:['basicAura'],
-      activeSkills:['basicAura'],
-      sectId:null
+      qi:0,
+      qiMul:1,
+      power:0,
+      sectId:null,
+      activeSkills:[]
+    },
+    exploring:false,
+    currentMapId:null,
+    equips:[],
+    equipSlots:{
+      weapon:null,armor:null,head:null,neck:null,ring:null,belt:null,boots:null,treasure:null
+    },
+    bag:[],
+    pets:[],
+    nextPetId:1,
+    activePetId:null,
+    sect:{
+      id:null,
+      contrib:0,
+      tasks:[],
+      shopItems:[]
+    },
+    tower:{
+      maxFloor:0,
+      curFloor:0
+    },
+    rebirth:{
+      count:0,
+      soul:0
     },
     stats:{
       totalKills:0,
@@ -681,960 +865,80 @@ function defaultGame(){
       bossKills:0,
       deaths:0,
       breakthroughs:0,
+      forgeCount:0,
       petCount:0,
-      sectTasksDone:0,
-      forgeCount:0
-    },
-    inventory:[],
-    bag:[],
-    pets:[],
-    activePetId:null,
-    sect:{
-      contrib:0,
-      tasks:[]
-    },
-    currentMapId:null,
-    exploring:false,
-    nextItemId:1,
-    nextBagId:1,
-    nextPetId:1,
-    lastSave:null
+      sectTasksDone:0
+    }
   };
 }
 
-/*********** 工具函数 ***********/
-function realmName(idx){
-  if(idx<0) idx=0;
-  if(idx>=REALM_STEPS.length) idx=REALM_STEPS.length-1;
-  return REALM_STEPS[idx].name;
-}
-function getRealmObj(){return REALM_STEPS[Math.min(game.player.realmIndex,REALM_STEPS.length-1)];}
-function getSect(){return SECTS.find(s=>s.id===game.player.sectId)||null;}
-
-function addGlobalLog(text){
-  const box=document.getElementById('global-log');
-  if(!box) return;
-  const p=document.createElement('p');
-  p.textContent=text;
-  box.appendChild(p);
-  while(box.childNodes.length>200) box.removeChild(box.firstChild);
-  box.scrollTop=box.scrollHeight;
-}
-function addBattleLog(text){
-  const box=document.getElementById('battle-log');
-  if(!box) return;
-  const p=document.createElement('p');
-  p.textContent=text;
-  box.appendChild(p);
-  while(box.childNodes.length>200) box.removeChild(box.firstChild);
-  box.scrollTop=box.scrollHeight;
-}
-function addSystemLog(text){
-  const box=document.getElementById('system-log');
-  if(!box) return;
-  const p=document.createElement('p');
-  p.textContent=text;
-  box.appendChild(p);
-  while(box.childNodes.length>200) box.removeChild(box.firstChild);
-  box.scrollTop=box.scrollHeight;
-}
-
-function findBagDef(id){return BAG_ITEMS_DEF.find(x=>x.id===id)||null;}
-
-function addBagItem(defId,count){
-  const def=findBagDef(defId); if(!def) return;
-  let entry=game.bag.find(b=>b.defId===defId);
-  if(entry) entry.count+=count;
-  else game.bag.push({id:game.nextBagId++, defId:defId, count:count});
-}
-
-function makeGear(name,slot,quality,atk,def){
-  const elem=ELEMENTS[Math.floor(Math.random()*ELEMENTS.length)];
-  return {
-    id:game.nextItemId++,
-    name:name,
-    slot:slot,
-    quality:Math.max(0,Math.min(quality,QUALITIES.length-1)),
-    atk:atk||0,
-    def:def||0,
-    elem:elem
-  };
-}
-
-function gearSellValue(item){
-  const base=item.atk+item.def+10;
-  return Math.max(5,Math.round(base*(1+item.quality*0.3)));
-}
-
-function getEquipped(slotId){
-  return game.inventory.find(it=>it.equipped && it.slot===slotId) || null;
-}
-
-/*********** 属性与战斗相关计算 ***********/
+// 属性与战力计算
 function recalcStats(){
   const p=game.player;
-  const a=p.attrs;
-  let atk=8+a.str*2+p.realmIndex*3;
-  let def=3+a.vit*1.6+p.realmIndex*2;
-  let hp=90+a.vit*20+p.realmIndex*40;
-  let mp=50+a.wis*12+p.realmIndex*18;
-
-  game.inventory.forEach(it=>{
-    if(it.equipped){
-      atk+=it.atk;
-      def+=it.def;
-      hp+=Math.round(it.def*1.5);
+  const bonus=getRebirthBonus();
+  let baseAtk = 6 + p.attrs.str*2 + p.level*1.5 + p.realmIndex*3;
+  let baseDef = 3 + p.attrs.vit*1.2 + p.realmIndex*1.5;
+  let baseHp = 80 + p.attrs.vit*12 + p.realmIndex*35;
+  let baseMp = 40 + p.attrs.wis*10 + p.realmIndex*20;
+  let critRate = 0.05 + p.attrs.agi*0.003;
+  // 宗门加成
+  let atkMul=1, defMul=1, hpMul=1, mpMul=1, qiMul=1;
+  let extraStr=0, extraVit=0, extraAgi=0, extraWis=0;
+  if(p.sectId){
+    const sect=SECTS.find(s=>s.id===p.sectId);
+    if(sect && sect.bonus){
+      const b=sect.bonus;
+      if(b.atk) atkMul+=b.atk;
+      if(b.def) defMul+=b.def;
+      if(b.hp)  hpMul+=b.hp;
+      if(b.qi)  qiMul+=b.qi;
+      if(b.crit) critRate+=b.crit;
+      if(b.str) extraStr+=b.str;
+      if(b.vit) extraVit+=b.vit;
+      if(b.agi) extraAgi+=b.agi;
+      if(b.wis) extraWis+=b.wis;
     }
-  });
-
-  // 神通 & 宗门
-  let atkMul=1, defMul=1, hpMul=1, mpMul=1, qiMul=1, critBonus=0, dmgRed=0;
-  game.player.activeSkills.forEach(id=>{
-    const sk=SKILLS.find(s=>s.id===id);
-    if(!sk) return;
-    if(sk.type==='atkMul') atkMul+=sk.value;
-    if(sk.type==='defMul') defMul+=sk.value;
-    if(sk.type==='hpMul') hpMul+=sk.value;
-    if(sk.type==='qiMul') qiMul+=sk.value;
-    if(sk.type==='speed'){/* 战斗效率体现在全局 tick 已固定，这里仅做显示用 */}
-    if(sk.type==='crit') critBonus+=sk.value;
-    if(sk.type==='dmgRed') dmgRed+=sk.value;
-  });
-  const sect=getSect();
-  if(sect && sect.effects){
-    if(sect.effects.atkMul) atkMul+=sect.effects.atkMul;
-    if(sect.effects.defMul) defMul+=sect.effects.defMul;
-    if(sect.effects.hpMul) hpMul+=sect.effects.hpMul;
-    if(sect.effects.mpMul) mpMul+=sect.effects.mpMul;
-    if(sect.effects.qiMul) qiMul+=sect.effects.qiMul;
-    if(sect.effects.crit) critBonus+=sect.effects.crit;
   }
+  // 转生加成
+  atkMul*=bonus.atkMul;
+  defMul*=bonus.defMul;
+  qiMul*=bonus.qiMul;
+  // 装备加成
+  let eqAtk=0, eqDef=0;
+  Object.keys(game.equipSlots).forEach(slot=>{
+    const id=game.equipSlots[slot];
+    if(!id) return;
+    const eq=game.equips.find(e=>e.id===id);
+    if(!eq) return;
+    eqAtk+=eq.atk||0;
+    eqDef+=eq.def||0;
+  });
+  baseAtk += eqAtk;
+  baseDef += eqDef;
+  baseHp  += Math.floor(eqDef*2);
+  // 灵宠攻击
+  const pet = game.pets.find(x=>x.id===game.activePetId) || null;
+  const petAtk = pet ? pet.atk : 0;
 
-  atk=Math.round(atk*atkMul);
-  def=Math.round(def*defMul);
-  hp=Math.round(hp*hpMul);
-  mp=Math.round(mp*mpMul);
-
-  p.atk=atk;
-  p.def=def;
-  p.hpMax=hp;
-  p.mpMax=mp;
+  p.atk = Math.max(1, Math.round(baseAtk * atkMul) + petAtk);
+  p.def = Math.max(0, Math.round(baseDef * defMul));
+  p.hpMax = Math.max(50, Math.round(baseHp * hpMul));
+  p.mpMax = Math.max(20, Math.round(baseMp * mpMul));
   if(p.hp>p.hpMax) p.hp=p.hpMax;
   if(p.mp>p.mpMax) p.mp=p.mpMax;
-  p.qiMul=1+qiMul;
-  p.critRate = 0.05 + a.agi*0.002 + critBonus;
-  p.dmgRed = dmgRed;
+  p.critRate = Math.max(0.01, Math.min(0.6, critRate));
+  p.qiMul = qiMul;
+  p.power = p.atk*3 + p.def*2 + p.hpMax*0.4 + (petAtk*4);
 }
 
-/*********** UI 更新 ***********/
-function updateRoleUI(){
-  const p=game.player;
-  document.getElementById('realmName').textContent=realmName(p.realmIndex);
-  const rootDesc = p.root>=15?'逆天灵根':p.root>=10?'天灵根':p.root>=7?'上品灵根':p.root>=4?'中品灵根':'下品灵根';
-  document.getElementById('rootDesc').textContent=rootDesc+'（'+p.root+'）';
-  document.getElementById('hpNow').textContent=p.hp;
-  document.getElementById('hpMax').textContent=p.hpMax;
-  document.getElementById('mpNow').textContent=p.mp;
-  document.getElementById('mpMax').textContent=p.mpMax;
-  const need=getRealmObj().qi;
-  document.getElementById('qiNow').textContent=Math.floor(p.qi);
-  document.getElementById('qiNeed').textContent=need;
-  document.getElementById('hpBar').style.width=(p.hp/p.hpMax*100).toFixed(1)+'%';
-  document.getElementById('mpBar').style.width=(p.mp/p.mpMax*100).toFixed(1)+'%';
-  document.getElementById('xpBar').style.width=(p.qi/need*100).toFixed(1)+'%';
-  document.getElementById('attr-str').textContent=p.attrs.str;
-  document.getElementById('attr-vit').textContent=p.attrs.vit;
-  document.getElementById('attr-agi').textContent=p.attrs.agi;
-  document.getElementById('attr-wis').textContent=p.attrs.wis;
-  document.getElementById('attr-free').textContent=p.freePoints;
-  document.getElementById('stat-atk').textContent=p.atk;
-  document.getElementById('stat-def').textContent=p.def;
-  document.getElementById('stat-crit').textContent=(p.critRate*100).toFixed(1)+'%';
-  document.getElementById('stat-afk').textContent=(100*(p.qiMul||1)).toFixed(0)+'%';
-  document.getElementById('top-gold').textContent=p.gold;
-  document.getElementById('top-realm').textContent=realmName(p.realmIndex);
-  const sect=getSect();
-  document.getElementById('home-sect-name').textContent=sect?sect.name:'无';
-  document.getElementById('top-sect').textContent=sect?sect.name:'无';
-  document.getElementById('stat-break').textContent=game.stats.breakthroughs;
-  document.getElementById('stat-kill').textContent=game.stats.totalKills;
-  document.getElementById('stat-elite').textContent=game.stats.eliteKills;
-  document.getElementById('stat-boss').textContent=game.stats.bossKills;
-  document.getElementById('stat-death').textContent=game.stats.deaths;
-}
-
-function updateEquipUI(){
-  GEAR_SLOTS.forEach(slot=>{
-    const it=getEquipped(slot.id);
-    const span=document.getElementById('equip-'+slot.id);
-    const vis=document.getElementById('vis-'+slot.id);
-    if(it){
-      const text='['+QUALITIES[it.quality]+'] '+it.name;
-      if(span){
-        span.innerHTML='<span class="rare-'+it.quality+'">'+text+'</span><span class="badge">'+it.elem+'</span>';
-      }
-      if(vis){
-        vis.textContent=it.name;
-        vis.className='slot-item rare-'+it.quality;
-      }
-    }else{
-      if(span) span.textContent='未装备';
-      if(vis){ vis.textContent='—'; vis.className='slot-item'; }
-    }
-  });
-  const pet=game.pets.find(p=>p.id===game.activePetId)||null;
-  document.getElementById('vis-pet').textContent=pet?('灵宠：'+pet.name+'（攻+'+pet.atk+'）'):'无';
-}
-
-function updateSkillUI(){
-  const box=document.getElementById('skill-list');
-  box.innerHTML='';
-  SKILLS.forEach(sk=>{
-    const row=document.createElement('div');
-    row.className='equip-item';
-    const known=game.player.knownSkills.includes(sk.id);
-    const active=game.player.activeSkills.includes(sk.id);
-    const canUse = known && game.player.realmIndex>=sk.req;
-    let title=sk.name+' ';
-    title+='<span class="badge">需要：'+realmName(sk.req)+'</span>';
-    title+='<span class="badge">'+(sk.source==='start'?'初始':sk.source==='scroll'?'秘卷':'宗门')+'</span>';
-    row.innerHTML='<span class="stat-label">'+title+'</span><br><span class="stat-value">'+sk.desc+'</span>';
-    const btn=document.createElement('button');
-    btn.className='small';
-    if(!known){
-      btn.textContent='未掌握';
-      btn.disabled=true;
-    }else{
-      btn.textContent=active?'取消':'启用';
-      btn.disabled=!canUse;
-      btn.addEventListener('click',function(){
-        if(active){
-          game.player.activeSkills=game.player.activeSkills.filter(id=>id!==sk.id);
-        }else{
-          if(game.player.activeSkills.length>=4){
-            alert('最多同时启用 4 条神通 / 心法。');
-            return;
-          }
-          game.player.activeSkills.push(sk.id);
-        }
-        recalcStats();
-        updateAllUI();
-      });
-    }
-    row.appendChild(document.createElement('br'));
-    row.appendChild(btn);
-    if(!known){
-      const tip=document.createElement('span');
-      tip.className='small-label';
-      tip.textContent='（需通过秘卷或宗门奖励解锁）';
-      row.appendChild(tip);
-    }else if(known && !canUse){
-      const tip=document.createElement('span');
-      tip.className='small-label';
-      tip.textContent='（境界不足，暂无法启用）';
-      row.appendChild(tip);
-    }
-    box.appendChild(row);
-  });
-}
-
-function updateMapUI(){
-  const tbody=document.getElementById('map-table-body');
-  tbody.innerHTML='';
-  MAPS.forEach(m=>{
-    const tr=document.createElement('tr');
-    const tdName=document.createElement('td');
-    tdName.textContent=m.name;
-    const tdReq=document.createElement('td');
-    tdReq.textContent=realmName(m.req);
-    const tdDanger=document.createElement('td');
-    tdDanger.textContent='★'.repeat(m.danger);
-    const tdLoot=document.createElement('td');
-    tdLoot.textContent=m.loot;
-    const tdOp=document.createElement('td');
-    const btn=document.createElement('button');
-    btn.className='small';
-    btn.textContent='设为挂机地图';
-    btn.addEventListener('click',function(){
-      game.currentMapId=m.id;
-      document.getElementById('cur-map-name').textContent=m.name;
-      document.getElementById('top-map').textContent=m.name;
-      addSystemLog('你将挂机地点切换为「'+m.name+'」。');
-    });
-    tdOp.appendChild(btn);
-    tr.appendChild(tdName);tr.appendChild(tdReq);tr.appendChild(tdDanger);tr.appendChild(tdLoot);tr.appendChild(tdOp);
-    tbody.appendChild(tr);
-  });
-}
-
-const warehouseFilter={slot:'all', quality:'all', elem:'all'};
-
-function filterGear(item){
-  if(warehouseFilter.slot!=='all' && item.slot!==warehouseFilter.slot) return false;
-  if(warehouseFilter.quality!=='all' && item.quality!==warehouseFilter.quality) return false;
-  if(warehouseFilter.elem!=='all' && item.elem!==warehouseFilter.elem) return false;
-  return true;
-}
-
-function updateWarehouseUI(){
-  document.getElementById('warehouse-cap').textContent='容量：'+game.inventory.length+' 件';
-  const list=document.getElementById('warehouse-list');
-  list.innerHTML='';
-  game.inventory.filter(filterGear).forEach(it=>{
-    const row=document.createElement('div');
-    row.className='equip-item rare-'+it.quality;
-    const slotName=(GEAR_SLOTS.find(s=>s.id===it.slot)||{}).label||'';
-    row.innerHTML='['+QUALITIES[it.quality]+'] '+it.name+
-      ' <span class="badge">'+slotName+'</span>'+
-      ' <span class="badge">'+it.elem+'</span><br>'+
-      '<span class="small-label">攻+'+it.atk+' 防+'+it.def+'</span>';
-    const btnEquip=document.createElement('button');
-    btnEquip.className='small';
-    const isEq=!!it.equipped;
-    btnEquip.textContent=isEq?'卸下':'装备';
-    btnEquip.addEventListener('click',function(){
-      if(isEq){
-        it.equipped=false;
-      }else{
-        game.inventory.forEach(g=>{
-          if(g.slot===it.slot && g.id!==it.id) g.equipped=false;
-        });
-        it.equipped=true;
-      }
-      recalcStats();
-      updateAllUI();
-    });
-    const btnSell=document.createElement('button');
-    btnSell.className='small';
-    btnSell.textContent='出售';
-    btnSell.disabled=it.equipped;
-    btnSell.addEventListener('click',function(){
-      if(it.equipped){alert('已装备的法器不能出售。');return;}
-      const val=gearSellValue(it);
-      game.player.gold+=val;
-      game.inventory=game.inventory.filter(g=>g.id!==it.id);
-      addGlobalLog('你出售了法器「'+it.name+'」，获得灵石 '+val+'。');
-      recalcStats();
-      updateAllUI();
-    });
-    row.appendChild(document.createElement('br'));
-    row.appendChild(btnEquip);
-    row.appendChild(document.createTextNode(' '));
-    row.appendChild(btnSell);
-    list.appendChild(row);
-  });
-}
-
-let bagTypeFilter='all';
-let bagQualityFilter='all';
-
-function updateBagUI(){
-  document.getElementById('bag-cap').textContent='物品种类：'+game.bag.length;
-  const list=document.getElementById('bag-list');
-  list.innerHTML='';
-  let arr=game.bag.slice();
-  arr=arr.filter(entry=>{
-    const def=findBagDef(entry.defId); if(!def) return false;
-    if(bagTypeFilter!=='all' && def.type!==bagTypeFilter) return false;
-    if(bagQualityFilter!=='all' && def.quality!==bagQualityFilter) return false;
-    return true;
-  });
-  arr.forEach(entry=>{
-    const def=findBagDef(entry.defId); if(!def) return;
-    const row=document.createElement('div');
-    row.className='item-row rare-'+def.quality;
-    row.innerHTML='['+QUALITIES[def.quality]+'] '+def.name+' ×'+entry.count+
-      ' <span class="badge">'+(BAG_TYPES.find(t=>t.id===def.type)||{}).name+'</span><br>'+
-      '<span class="small-label">'+def.desc+'</span>';
-    if(def.effect){
-      const btn=document.createElement('button');
-      btn.className='small';
-      btn.textContent='使用';
-      btn.addEventListener('click',function(){ useBagItem(entry.id); });
-      row.appendChild(document.createElement('br'));
-      row.appendChild(btn);
-    }
-    list.appendChild(row);
-  });
-}
-
-function updatePetsUI(){
-  const active=game.pets.find(p=>p.id===game.activePetId)||null;
-  document.getElementById('pet-active').textContent=active?(active.name+' Lv.'+active.level+'（攻+'+active.atk+'）'):'无';
-  document.getElementById('pets-active-name').textContent=document.getElementById('pet-active').textContent;
-  document.getElementById('pets-count').textContent=game.pets.length;
-  const mini=document.getElementById('pet-mini-list');
-  const full=document.getElementById('pets-list');
-  mini.innerHTML=''; full.innerHTML='';
-  game.pets.forEach(pet=>{
-    const mkRow=function(isFull){
-      const row=document.createElement('div');
-      row.className='stat-row';
-      const left=document.createElement('span');
-      left.className='stat-label';
-      left.textContent=pet.name+' Lv.'+pet.level;
-      const right=document.createElement('span');
-      right.className='stat-value';
-      right.textContent='攻:'+pet.atk;
-      row.appendChild(left);row.appendChild(right);
-      const btn=document.createElement('button');
-      btn.className='small';
-      btn.textContent=(game.activePetId===pet.id)?'出战中':'出战';
-      btn.addEventListener('click',function(){
-        game.activePetId=pet.id;
-        updatePetsUI();
-      });
-      row.appendChild(btn);
-      if(isFull){
-        const exp=document.createElement('span');
-        exp.className='badge';
-        exp.textContent='经验:'+pet.xp;
-        row.appendChild(exp);
-      }
-      return row;
-    };
-    mini.appendChild(mkRow(false));
-    full.appendChild(mkRow(true));
-  });
-}
-
-function updateSectUI(){
-  const sect=game.player.sectId?getSect():null;
-  document.getElementById('sect-contrib').textContent=game.sect.contrib;
-  document.getElementById('sect-name').textContent=sect?sect.name:'未加入';
-  document.getElementById('sect-title').textContent=sect?(game.sect.contrib>800?'内门长老':game.sect.contrib>400?'内门弟子':game.sect.contrib>150?'真传弟子':'外门弟子'):'无';
-  // sect list table
-  const tbody=document.getElementById('sect-table-body');
-  tbody.innerHTML='';
-  SECTS.forEach(s=>{
-    const tr=document.createElement('tr');
-    const tdName=document.createElement('td');tdName.textContent=s.name;
-    const tdDesc=document.createElement('td');tdDesc.textContent=s.desc;
-    const tdOp=document.createElement('td');
-    const btn=document.createElement('button');
-    btn.className='small';
-    if(game.player.sectId===s.id){
-      btn.textContent='已加入';
-      btn.disabled=true;
-    }else if(game.player.sectId){
-      btn.textContent='已拜他宗';
-      btn.disabled=true;
-    }else{
-      btn.textContent='拜入此宗';
-      btn.addEventListener('click',function(){
-        game.player.sectId=s.id;
-        addGlobalLog('你正式拜入「'+s.name+'」，从此有了宗门靠山。');
-        recalcStats();
-        // 初始给几条宗门任务
-        if(game.sect.tasks.length===0){
-          for(let i=0;i<3;i++){ game.sect.tasks.push(generateSectTask()); }
-        }
-        updateAllUI();
-      });
-    }
-    tdOp.appendChild(btn);
-    tr.appendChild(tdName);tr.appendChild(tdDesc);tr.appendChild(tdOp);
-    tbody.appendChild(tr);
-  });
-
-  // tasks
-  const tbox=document.getElementById('sect-task-list');
-  tbox.innerHTML='';
-  game.sect.tasks.forEach((task,index)=>{
-    const row=document.createElement('div');
-    row.className='item-row';
-    let targetDesc=task.desc;
-    const done=task.progress>=task.need;
-    row.innerHTML='<span class="stat-label">'+targetDesc+'</span><br>'+
-      '<span class="small-label">进度：'+Math.min(task.progress,task.need)+' / '+task.need+' · 奖励贡献：'+task.reward+'</span>';
-    if(done){
-      const btn=document.createElement('button');
-      btn.className='small';
-      btn.textContent='领取奖励';
-      btn.addEventListener('click',function(){
-        game.sect.contrib+=task.reward;
-        game.stats.sectTasksDone++;
-        addGlobalLog('你完成宗门任务「'+task.desc+'」，获得贡献 '+task.reward+'。');
-        // 替换任务
-        game.sect.tasks[index]=generateSectTask();
-        updateAllUI();
-      });
-      row.appendChild(document.createElement('br'));
-      row.appendChild(btn);
-    }
-    tbox.appendChild(row);
-  });
-
-  // sect shop
-  const sbox=document.getElementById('sect-shop-list');
-  sbox.innerHTML='';
-  SECT_SHOP_ITEMS.forEach(item=>{
-    const row=document.createElement('div');
-    row.className='item-row';
-    row.innerHTML='<span class="stat-label">'+item.name+'（'+item.cost+' 贡献）</span><br>'+
-      '<span class="small-label">'+item.desc+' · 需要境界：'+realmName(item.realmReq)+'</span>';
-    const btn=document.createElement('button');
-    btn.className='small';
-    btn.textContent='兑换';
-    btn.disabled=!sect || game.sect.contrib<item.cost || game.player.realmIndex<item.realmReq;
-    btn.addEventListener('click',function(){
-      if(!sect){alert('尚未加入任何宗门。');return;}
-      if(game.sect.contrib<item.cost){alert('宗门贡献不足。');return;}
-      if(game.player.realmIndex<item.realmReq){alert('境界不足，暂时无资格兑换此物。');return;}
-      game.sect.contrib-=item.cost;
-      const reward=item.make();
-      if(reward && reward.type==='petEgg'){
-        // 直接孵化一只灵宠
-        const pet={
-          id:game.nextPetId++,
-          name:'宗门灵兽',
-          level:1,
-          atk:25+game.player.realmIndex*2,
-          xp:0
-        };
-        game.pets.push(pet);
-        game.stats.petCount++;
-        if(!game.activePetId) game.activePetId=pet.id;
-        addGlobalLog('你从宗门宝库兑换了一枚「灵兽蛋」，孵化出灵宠「'+pet.name+'」。');
-      }else if(reward){
-        game.inventory.push(reward);
-        addGlobalLog('你从宗门宝库兑换了法器「'+reward.name+'」。');
-      }
-      recalcStats();
-      updateAllUI();
-    });
-    row.appendChild(document.createElement('br'));
-    row.appendChild(btn);
-    sbox.appendChild(row);
-  });
-}
-
-function generateSectTask(){
-  const tpl=SECT_TASK_TEMPLATES[Math.floor(Math.random()*SECT_TASK_TEMPLATES.length)];
-  return {id:tpl.id, type:tpl.type, need:tpl.need, desc:tpl.desc, reward:tpl.reward, progress:0};
-}
-
-function updateShopUI(){
-  document.getElementById('shop-gold').textContent=game.player.gold;
-  const box=document.getElementById('shop-list');
-  box.innerHTML='';
-  SHOP_ITEMS.forEach(s=>{
-    const def=findBagDef(s.ref);
-    if(!def) return;
-    const row=document.createElement('div');
-    row.className='item-row rare-'+def.quality;
-    row.innerHTML='['+QUALITIES[def.quality]+'] '+def.name+'（'+s.price+' 灵石）<br>'+
-      '<span class="small-label">'+def.desc+' · 需要境界：'+realmName(s.realmReq)+'</span>';
-    const btn=document.createElement('button');
-    btn.className='small';
-    btn.textContent='购买';
-    btn.disabled=game.player.gold<s.price || game.player.realmIndex<s.realmReq;
-    btn.addEventListener('click',function(){
-      if(game.player.gold<s.price){alert('灵石不足。');return;}
-      if(game.player.realmIndex<s.realmReq){alert('境界不足，暂时不能购买此物。');return;}
-      game.player.gold-=s.price;
-      addBagItem(s.ref,1);
-      addGlobalLog('你在万宝阁购买了「'+def.name+'」。');
-      updateAllUI();
-    });
-    row.appendChild(document.createElement('br'));
-    row.appendChild(btn);
-    box.appendChild(row);
-  });
-}
-
-const FORGE_RECIPES = [
-  {id:'ironSword', name:'玄铁长剑', desc:'前期不错的武器。', realmReq:2,
-   mats:[{id:'oreIron',count:3}], gold:60,
-   make:function(){return makeGear('玄铁长剑','weapon',2,26,2);}},
-  {id:'ironArmor', name:'玄铁软甲', desc:'增加一定防御与生命。', realmReq:3,
-   mats:[{id:'oreIron',count:3},{id:'oreWood',count:1}], gold:70,
-   make:function(){return makeGear('玄铁软甲','armor',2,4,30);}},
-  {id:'goldSword', name:'赤金战剑', desc:'品质良品的攻击型武器。', realmReq:5,
-   mats:[{id:'oreGold',count:4},{id:'oreIron',count:2}], gold:120,
-   make:function(){return makeGear('赤金战剑','weapon',3,45,4);}},
-  {id:'fireRelic', name:'火焰法轮', desc:'火属性法宝，大幅提升攻击。', realmReq:7,
-   mats:[{id:'oreFire',count:3},{id:'oreGold',count:2},{id:'oreWood',count:2}], gold:220,
-   make:function(){return makeGear('火焰法轮','relic',4,80,8);}},
-  {id:'darkArmor', name:'幽冥战甲', desc:'来自幽冥沼泽的诡异战甲。', realmReq:8,
-   mats:[{id:'oreDark',count:3},{id:'oreIron',count:3}], gold:260,
-   make:function(){return makeGear('幽冥战甲','armor',4,10,70);}},
-  {id:'demonSet', name:'妖丹随机法器', desc:'消耗妖丹，获得与你境界相符的随机法器。', realmReq:10,
-   mats:[{id:'oreDemon',count:2}], gold:320,
-   make:function(){
-     const slots=['weapon','armor','head','neck','ring','belt','boot','relic'];
-     const slot=slots[Math.floor(Math.random()*slots.length)];
-     const q=4+Math.floor(Math.random()*2); // 绝品~灵宝
-     const base=40+game.player.realmIndex*3;
-     const atk = (slot==='weapon'||slot==='relic')?base:Math.round(base*0.3);
-     const def = (slot==='armor'||slot==='head'||slot==='belt'||slot==='boot')?Math.round(base*0.6):Math.round(base*0.2);
-     return makeGear('妖煞'+(GEAR_SLOTS.find(s=>s.id===slot)||{}).label,slot,q,atk,def);
-   }}
-];
-
-function updateForgeUI(){
-  const tbody=document.getElementById('forge-table-body');
-  tbody.innerHTML='';
-  FORGE_RECIPES.forEach(r=>{
-    const tr=document.createElement('tr');
-    const tdName=document.createElement('td');tdName.textContent=r.name;
-    const tdMats=document.createElement('td');
-    tdMats.textContent=r.mats.map(m=>{
-      const def=findBagDef(m.id);return (def?def.name:m.id)+'×'+m.count;
-    }).join('，')+'；灵石 '+r.gold;
-    const tdReq=document.createElement('td');tdReq.textContent=realmName(r.realmReq);
-    const tdDesc=document.createElement('td');tdDesc.textContent=r.desc;
-    const tdOp=document.createElement('td');
-    const btn=document.createElement('button');
-    btn.className='small';
-    btn.textContent='锻造';
-    btn.addEventListener('click',function(){ forgeItem(r); });
-    tdOp.appendChild(btn);
-    tr.appendChild(tdName);tr.appendChild(tdMats);tr.appendChild(tdReq);tr.appendChild(tdDesc);tr.appendChild(tdOp);
-    tbody.appendChild(tr);
-  });
-
-  const matBox=document.getElementById('forge-mat-list');
-  matBox.innerHTML='';
-  BAG_ITEMS_DEF.filter(d=>d.type==='mat').forEach(def=>{
-    const entry=game.bag.find(b=>b.defId===def.id);
-    const count=entry?entry.count:0;
-    const row=document.createElement('div');
-    row.className='item-row rare-'+def.quality;
-    row.textContent=def.name+' ×'+count;
-    matBox.appendChild(row);
-  });
-}
-
-function updateStatsPage(){
-  document.getElementById('st-kill').textContent=game.stats.totalKills;
-  document.getElementById('st-elite').textContent=game.stats.eliteKills;
-  document.getElementById('st-boss').textContent=game.stats.bossKills;
-  document.getElementById('st-death').textContent=game.stats.deaths;
-  document.getElementById('st-bt').textContent=game.stats.breakthroughs;
-  document.getElementById('st-pet').textContent=game.stats.petCount;
-  document.getElementById('st-sect-task').textContent=game.stats.sectTasksDone;
-  document.getElementById('st-forge').textContent=game.stats.forgeCount;
-}
-
-function updateTopCurrentMap(){
-  const m=MAPS.find(x=>x.id===game.currentMapId)||null;
-  document.getElementById('cur-map-name').textContent=m?m.name:'无';
-  document.getElementById('top-map').textContent=m?m.name:'无';
-}
-
-function updateAllUI(){
-  recalcStats();
-  updateRoleUI();
-  updateEquipUI();
-  updateSkillUI();
-  updateMapUI();
-  updateWarehouseUI();
-  updateBagUI();
-  updatePetsUI();
-  updateSectUI();
-  updateShopUI();
-  updateForgeUI();
-  updateStatsPage();
-  updateTopCurrentMap();
-}
-
-/*********** 物品使用 ***********/
-function useBagItem(entryId){
-  const entry=game.bag.find(b=>b.id===entryId); if(!entry) return;
-  const def=findBagDef(entry.defId); if(!def) return;
-  const p=game.player;
-  if(def.effect==='hpFull'){
-    p.hp=p.hpMax;
-    alert('你服下「'+def.name+'」，气血恢复如初。');
-  }else if(def.effect==='qi'){
-    p.qi+=def.amount;
-    alert('你服下「'+def.name+'」，境界灵气提升 '+def.amount+' 点。');
-  }else if(def.effect==='rootUp'){
-    if(p.root>=15){
-      alert('你的灵根资质已无法再提升。');
-    }else{
-      p.root+=def.amount;
-      alert('你服下「'+def.name+'」，只觉浑身经脉被重新洗炼，灵根提升！当前灵根：'+p.root);
-    }
-  }else if(def.effect==='unlockSkill'){
-    if(!game.player.knownSkills.includes(def.skillId)){
-      game.player.knownSkills.push(def.skillId);
-      addGlobalLog('你参悟「'+def.name+'」，掌握了新的神通。');
-      alert('你掌握了新的神通！');
-    }else{
-      alert('你已经掌握了对应神通。');
-      return;
-    }
-  }
-  // 消耗
-  entry.count--;
-  if(entry.count<=0){
-    game.bag=game.bag.filter(b=>b.id!==entry.id);
-  }
-  updateAllUI();
-}
-
-/*********** 锻造 ***********/
-function haveMats(recipe){
-  return recipe.mats.every(m=>{
-    const entry=game.bag.find(b=>b.defId===m.id);
-    return entry && entry.count>=m.count;
-  });
-}
-
-function forgeItem(recipe){
-  if(game.player.realmIndex<recipe.realmReq){
-    alert('境界不足，锻造此物至少需要：'+realmName(recipe.realmReq));
-    return;
-  }
-  if(game.player.gold<recipe.gold){
-    alert('灵石不足。');
-    return;
-  }
-  if(!haveMats(recipe)){
-    alert('材料不足，查看配方需求。');
-    return;
-  }
-  // 扣材料和灵石
-  recipe.mats.forEach(m=>{
-    const entry=game.bag.find(b=>b.defId===m.id);
-    if(entry){
-      entry.count-=m.count;
-      if(entry.count<=0) game.bag=game.bag.filter(b=>b.id!==entry.id);
-    }
-  });
-  game.player.gold-=recipe.gold;
-  const gear=recipe.make();
-  if(gear){
-    game.inventory.push(gear);
-    addGlobalLog('你在锻造炉中炼成了「'+gear.name+'」。');
-  }
-  game.stats.forgeCount++;
-  // 宗门任务进度
-  game.sect.tasks.forEach(t=>{
-    if(t.type==='forge' && t.progress<t.need) t.progress++;
-  });
-  updateAllUI();
-}
-
-/*********** 宗门任务进度更新 ***********/
-function updateSectTaskProgressByKill(kind){
-  game.sect.tasks.forEach(t=>{
-    if(t.type==='kill' && t.progress<t.need) t.progress++;
-    if(kind==='elite' && t.type==='elite' && t.progress<t.need) t.progress++;
-    if(kind==='boss' && t.type==='boss' && t.progress<t.need) t.progress++;
-  });
-}
-
-/*********** 突破 ***********/
-function breakthrough(){
-  const p=game.player;
-  const need=getRealmObj().qi;
-  if(p.qi<need){
-    alert('境界灵气不足，暂时无法突破。');
-    return;
-  }
-  if(p.realmIndex>=REALM_STEPS.length-1){
-    alert('你已站在渡劫巅峰，暂未实装更高境界。');
-    return;
-  }
-  p.qi-=need;
-  p.realmIndex++;
-  game.stats.breakthroughs++;
-  // 不再自动加点，改为获得可分配属性点
-  const gainPts = 6;
-  p.freePoints = (p.freePoints||0) + gainPts;
-  addGlobalLog('你成功突破至「'+realmName(p.realmIndex)+'」，获得 '+gainPts+' 点可分配属性点。');
-  recalcStats();
-  updateAllUI();
-}
-
-/*********** 战斗与挂机 ***********/
-function simulateBattle(){
-  if(!game.exploring || game.currentMapId===null) return;
-  const map=MAPS.find(m=>m.id===game.currentMapId); if(!map) return;
-  const p=game.player;
-  // 判断境界是否明显不足
-  if(p.realmIndex<map.req-2){
-    addSystemLog('你当前境界偏低，「'+map.name+'」压力极大。');
-  }
-  // 怪物类型
-  const r=Math.random();
-  let kind='normal', hpMul=1, atkMul=1, rewardMul=1;
-  if(r<0.08){ kind='boss'; hpMul=5; atkMul=3; rewardMul=3.5; }
-  else if(r<0.3){ kind='elite'; hpMul=2.5; atkMul=1.7; rewardMul=2; }
-  const baseHp=40+map.qi*4;
-  const baseAtk=6+map.gold*3;
-  const mHpMax=Math.round(baseHp*hpMul);
-  const mAtk=Math.round(baseAtk*atkMul);
-  let mHp=mHpMax;
-  let playerHp=p.hpMax;
-  addBattleLog('—— 在「'+map.name+'」遭遇【'+(kind==='normal'?'普通':kind==='elite'?'精英':'首领')+'】怪物（气血 '+mHpMax+' · 攻击 '+mAtk+'）——');
-  const pet=game.pets.find(x=>x.id===game.activePetId)||null;
-  const petAtk=pet?pet.atk:0;
-
-  let rounds=0;
-  let playerDead=false, monsterDead=false;
-  while(rounds<6 && !playerDead && !monsterDead){
-    rounds++;
-    // 玩家出手
-    let dmg=p.atk+petAtk;
-    let critFlag=false;
-    if(Math.random()<p.critRate){
-      dmg=Math.round(dmg*1.5);
-      critFlag=true;
-    }
-    dmg=Math.max(1,Math.round(dmg*0.7));
-    mHp-=dmg;
-    addBattleLog('第'+rounds+'回合，你对怪物造成 '+dmg+' 伤害'+(critFlag?'（暴击）':'')+'，怪物剩余 '+Math.max(mHp,0)+' 气血。');
-    if(mHp<=0){monsterDead=true;break;}
-    // 怪物反击
-    let mDmg=Math.max(1,Math.round(mAtk*0.7 - p.def*0.4));
-    if(p.dmgRed){ mDmg=Math.round(mDmg*(1-p.dmgRed)); }
-    if(mDmg<1) mDmg=1;
-    playerHp-=mDmg;
-    addBattleLog('　　 怪物反击，对你造成 '+mDmg+' 伤害。剩余气血（战斗中）约 '+Math.max(playerHp,0)+'。');
-    if(playerHp<=0){playerDead=true;break;}
-  }
-
-  if(monsterDead){
-
-    game.stats.totalKills++;
-    if(kind==='elite') game.stats.eliteKills++;
-    if(kind==='boss')  game.stats.bossKills++;
-    // 奖励：再次削弱灵石
-    let goldGain=Math.round(map.gold*rewardMul*0.4);
-    let qiGain=map.qi*rewardMul*(p.qiMul||1);
-    p.gold+=goldGain;
-    p.qi+=qiGain;
-    addBattleLog('你击败了【'+(kind==='normal'?'普通':kind==='elite'?'精英':'首领')+'】怪物，获得灵石 '+goldGain+'，灵气 '+Math.round(qiGain)+'。');
-    // 掉落装备
-    const equipChance = kind==='normal'?0.18:(kind==='elite'?0.45:0.78);
-    if(Math.random()<equipChance){
-      const qualityBase = kind==='normal'?1:(kind==='elite'?2:3);
-      const qIndex = Math.min(QUALITIES.length-1, qualityBase + Math.floor(map.danger/2));
-      const slot=GEAR_SLOTS[Math.floor(Math.random()*GEAR_SLOTS.length)].id;
-      const base=18+map.qi;
-      const atk = (slot==='weapon'||slot==='relic') ? base+map.danger*4 : Math.round(base*0.35);
-      const def = (slot==='armor'||slot==='head'||slot==='belt'||slot==='boot') ? Math.round(base*0.7) : Math.round(base*0.25);
-      const gear=makeGear(QUALITIES[qIndex]+'·'+(GEAR_SLOTS.find(s=>s.id===slot)||{}).label,slot,qIndex,atk,def);
-      game.inventory.push(gear);
-      addSystemLog('你获得了法器「'+gear.name+'」。');
-    }
-    // 掉落材料
-    const matChance = kind==='normal'?0.25:(kind==='elite'?0.45:0.7);
-    if(Math.random()<matChance){
-      // 根据地图等级发不同材料
-      let matId='oreIron';
-      if(map.id>=1 && map.id<=3) matId=Math.random()<0.5?'oreIron':'oreGold';
-      else if(map.id===4) matId=Math.random()<0.5?'oreDark':'oreIron';
-      else if(map.id===5) matId='oreFire';
-      else if(map.id>=6 && map.id<=7) matId=Math.random()<0.5?'oreWood':'oreDemon';
-      else if(map.id>=8) matId='oreDemon';
-      addBagItem(matId,1);
-      const md=findBagDef(matId);
-      addSystemLog('你从战场上拾取了材料「'+(md?md.name:matId)+'」。');
-    }
-    // 掉落秘卷
-    const scrollChance = kind==='elite'?0.08:(kind==='boss'?0.18:0.01);
-    if(Math.random()<scrollChance){
-      const scrollPool=['skillSword','skillBody','skillCrit'];
-      const sid=scrollPool[Math.floor(Math.random()*scrollPool.length)];
-      addBagItem(sid,1);
-      const sd=findBagDef(sid);
-      addSystemLog('你在尸骸中翻出一卷秘卷「'+(sd?sd.name:sid)+'」。');
-    }
-    // 灵宠捕获
-    if(kind!=='normal' && Math.random()<0.10){
-      const pet={
-        id:game.nextPetId++,
-        name:(kind==='boss'?'妖王幼崽':'灵兽'),
-        level:1,
-        atk:10+map.qi,
-        xp:0
-      };
-      game.pets.push(pet);
-      game.stats.petCount++;
-      if(!game.activePetId) game.activePetId=pet.id;
-      addGlobalLog('你收服了新的灵宠「'+pet.name+'」。');
-    }
-    // 灵宠经验
-    if(pet){
-      pet.xp+=10+map.qi*0.5;
-      while(pet.xp>=pet.level*40){
-        pet.xp-=pet.level*40;
-        pet.level++;
-        pet.atk+=6;
-        addSystemLog('灵宠「'+pet.name+'」等级提升至 '+pet.level+'。');
-      }
-    }
-    updateSectTaskProgressByKill(kind);
-  }else if(playerDead){
-    game.stats.deaths++;
-    addBattleLog('你被【'+(kind==='normal'?'普通':kind==='elite'?'精英':'首领')+'】怪物击败，本场战斗无任何奖励。');
-  }else{
-    // 均势，略给一点灵气
-    const qiGain = map.qi*0.5*(p.qiMul||1);
-    p.qi+=qiGain;
-    addBattleLog('你与怪物僵持一阵后脱身，仅获得少量灵气 '+Math.round(qiGain)+'。');
-  }
-  // 无论胜负，都自动回满
-  p.hp=p.hpMax;
-  p.mp=p.mpMax;
-  updateAllUI();
-}
-
-/*********** 挂机循环 ***********/
-let battleCooldown = 0;
-const TICK_MS = 400;
-function tick(){
-  if(game.exploring && game.currentMapId!==null){
-    if(battleCooldown<=0){
-      simulateBattle();
-      battleCooldown = 2000; // 两秒后再进行下一场战斗
-    }else{
-      battleCooldown -= TICK_MS;
-      if(battleCooldown<0) battleCooldown=0;
-    }
-  }else{
-    // 不挂机时，缓慢吐纳获得极少灵气
-    const p=game.player;
-    const base=(0.6 + p.root*0.15) * (TICK_MS/1000);
-    p.qi+=base*(p.qiMul||1);
-    if(p.qi>getRealmObj().qi) p.qi=getRealmObj().qi;
-    updateRoleUI();
-  }
-}
-
-/*********** 存档 ***********/
-const SAVE_KEY='xuanyu_full_world_save_v1';
+// 存档
 function saveGame(){
   try{
-    game.lastSave=Date.now();
     localStorage.setItem(SAVE_KEY, JSON.stringify(game));
-  }catch(e){}
+  }catch(e){
+    console.error(e);
+  }
 }
-
-function initAttrButtons(){
-  document.querySelectorAll('[data-add-attr]').forEach(btn=>{
-    btn.addEventListener('click',function(){
-      const key=btn.getAttribute('data-add-attr');
-      if(game.player.freePoints<=0){
-        alert('当前没有可分配的属性点。');
-        return;
-      }
-      if(!game.player.attrs[key] && game.player.attrs[key]!==0){
-        game.player.attrs[key]=0;
-      }
-      game.player.attrs[key]++;
-      game.player.freePoints--;
-      recalcStats();
-      updateAllUI();
-    });
-  });
-}
-
 function loadGame(){
   try{
     const raw=localStorage.getItem(SAVE_KEY);
@@ -1642,167 +946,990 @@ function loadGame(){
       game=JSON.parse(raw);
     }else{
       game=defaultGame();
-      // 初始给一点新手装备和丹药
-      const sword=makeGear('新手木剑','weapon',1,14,0);
-      const cloth=makeGear('粗布衣','armor',1,3,16);
-      sword.equipped=true; cloth.equipped=true;
-      game.inventory.push(sword,cloth);
-      addBagItem('hpPill',2);
-      addBagItem('qiSmall',3);
-      addGlobalLog('你从凡人起步，手持一柄木剑，一身粗布衣。');
+      addGlobalLog('你从一介凡人踏入修行之路。','good');
     }
   }catch(e){
     game=defaultGame();
   }
-  // 兼容旧存档：如果没有 freePoints 字段，补上
-  if(!game.player.freePoints && game.player.freePoints!==0){
-    game.player.freePoints = 0;
-  }
+  // 兼容字段
+  if(!game.player.freePoints && game.player.freePoints!==0) game.player.freePoints=0;
+  if(!game.sect) game.sect={id:null,contrib:0,tasks:[],shopItems:[]};
+  if(!game.tower) game.tower={maxFloor:0,curFloor:0};
+  if(!game.rebirth) game.rebirth={count:0,soul:0};
+  if(!game.stats) game.stats={totalKills:0,eliteKills:0,bossKills:0,deaths:0,breakthroughs:0,forgeCount:0,petCount:0,sectTasksDone:0};
+  if(!Array.isArray(game.sect.tasks)) game.sect.tasks=[];
+  // 清除老存档里的收服灵宠任务
+  game.sect.tasks = game.sect.tasks.filter(t=>t.type!=='pet');
 }
 
-/*********** 初始化 UI / 事件 ***********/
-function initNav(){
-  document.querySelectorAll('#nav button').forEach(btn=>{
-    btn.addEventListener('click',function(){
-      const page=btn.getAttribute('data-page');
-      document.querySelectorAll('#nav button').forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      document.querySelectorAll('.page').forEach(pg=>{
-        pg.classList.toggle('active', pg.id==='page-'+page);
-      });
-    });
-  });
-}
-
-function initWarehouseFilters(){
-  const slotG=document.getElementById('filter-slot-group');
-  const qG=document.getElementById('filter-quality-group');
-  const eG=document.getElementById('filter-ele-group');
-  function makeBtn(text,group,onClick,active){
-    const b=document.createElement('button');
-    b.className='filter-btn'+(active?' active':'');
-    b.textContent=text;
-    b.addEventListener('click',function(){
-      group.querySelectorAll('.filter-btn').forEach(x=>x.classList.remove('active'));
-      b.classList.add('active');
-      onClick();
-      updateWarehouseUI();
-    });
-    group.appendChild(b);
-  }
-  makeBtn('全部',slotG,function(){warehouseFilter.slot='all';},true);
-  GEAR_SLOTS.forEach(s=>{
-    makeBtn(s.label,slotG,function(){warehouseFilter.slot=s.id;},false);
-  });
-  makeBtn('全部',qG,function(){warehouseFilter.quality='all';},true);
-  QUALITIES.forEach((q,idx)=>{
-    makeBtn(q,qG,function(){warehouseFilter.quality=idx;},false);
-  });
-  makeBtn('全部',eG,function(){warehouseFilter.elem='all';},true);
-  ELEMENTS.forEach(el=>{
-    makeBtn(el,eG,function(){warehouseFilter.elem=el;},false);
-  });
-}
-
-function initBagFilters(){
-  const tG=document.getElementById('bag-type-group');
-  const qG=document.getElementById('bag-quality-group');
-  function makeBtn(text,group,onClick,active){
-    const b=document.createElement('button');
-    b.className='filter-btn'+(active?' active':'');
-    b.textContent=text;
-    b.addEventListener('click',function(){
-      group.querySelectorAll('.filter-btn').forEach(x=>x.classList.remove('active'));
-      b.classList.add('active');
-      onClick();
-      updateBagUI();
-    });
-    group.appendChild(b);
-  }
-  makeBtn('全部',tG,function(){bagTypeFilter='all';},true);
-  BAG_TYPES.forEach(t=>{
-    makeBtn(t.name,tG,function(){bagTypeFilter=t.id;},false);
-  });
-  makeBtn('全部',qG,function(){bagQualityFilter='all';},true);
-  QUALITIES.forEach((q,idx)=>{
-    makeBtn(q,qG,function(){bagQualityFilter=idx;},false);
-  });
-}
-
-function initButtons(){
-  document.getElementById('btn-break').addEventListener('click',breakthrough);
-  document.getElementById('btn-start').addEventListener('click',function(){
-    if(game.currentMapId===null){
-      alert('请先在「灵域地图」中选择一个挂机地图。');
-      return;
-    }
-    game.exploring=true;
-    addSystemLog('你开始在「'+(MAPS.find(m=>m.id===game.currentMapId)||{}).name+'」中长时间挂机试炼。');
-  });
-  document.getElementById('btn-stop').addEventListener('click',function(){
-    game.exploring=false;
-    addSystemLog('你结束了本次挂机，返回洞府调整状态。');
-  });
-  document.querySelectorAll('[data-sellq]').forEach(btn=>{
-    btn.addEventListener('click',function(){
-      const q=parseInt(btn.getAttribute('data-sellq'),10);
-      let gain=0;
-      const keep=[];
-      game.inventory.forEach(it=>{
-        if(it.equipped || it.quality>q) keep.push(it);
-        else gain+=gearSellValue(it);
-      });
-      if(gain<=0){
-        alert('没有符合条件的未装备法器。');
+// 属性按钮
+function initAttrButtons(){
+  document.querySelectorAll('.attr-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const key=btn.getAttribute('data-add-attr');
+      const p=game.player;
+      if(p.freePoints<=0){
+        alert('当前没有可分配的属性点。');
         return;
       }
-      game.inventory=keep;
-      game.player.gold+=gain;
-      addGlobalLog('你通过一键出售处理了一批法器，获得灵石 '+gain+'。');
+      if(!p.attrs[key] && p.attrs[key]!==0) p.attrs[key]=0;
+      p.attrs[key]++;
+      p.freePoints--;
+      recalcStats();
       updateAllUI();
     });
   });
-  document.getElementById('btn-sell-all').addEventListener('click',function(){
-    let gain=0;
-    const keep=[];
-    game.inventory.forEach(it=>{
-      if(it.equipped) keep.push(it);
-      else gain+=gearSellValue(it);
+}
+
+// 导航切换
+function initNav(){
+  const btns=document.querySelectorAll('nav button[data-page]');
+  btns.forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const page=btn.getAttribute('data-page');
+      document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+      const el=document.getElementById('page-'+page);
+      if(el) el.classList.add('active');
     });
-    if(gain<=0){
-      alert('没有可出售的法器。');
-      return;
-    }
-    game.inventory=keep;
-    game.player.gold+=gain;
-    addGlobalLog('你清理仓库，出售了全部未装备法器，获得灵石 '+gain+'。');
-    updateAllUI();
-  });
-  document.getElementById('btn-bag-sort').addEventListener('click',function(){
-    game.bag.sort((a,b)=>{
-      const da=findBagDef(a.defId), db=findBagDef(b.defId);
-      if(!da||!db) return 0;
-      if(da.type!==db.type) return da.type.localeCompare(db.type);
-      if(da.quality!==db.quality) return db.quality-da.quality;
-      return da.name.localeCompare(db.name);
-    });
-    updateBagUI();
   });
 }
 
-/*********** 启动 ***********/
-loadGame();
-recalcStats();
-window.addEventListener('load',function(){
-  initNav();
-  initWarehouseFilters();
-  initAttrButtons();
-  initBagFilters();
-  initButtons();
+// 地图渲染
+function renderMaps(){
+  const box=document.getElementById('map-list');
+  box.innerHTML='';
+  MAPS.forEach(map=>{
+    const row=document.createElement('div');
+    row.className='map-row' + (game.currentMapId===map.id?' active':'');
+    row.innerHTML=
+      '<div class="map-name">'+map.name+'</div>'+
+      '<div class="map-meta">'+
+        '<span>推荐：'+map.recommend+'</span>'+
+        '<span>危险度：'+map.diff+'/10</span>'+
+        '<span>灵气强度：'+map.qi+'</span>'+
+      '</div>'+
+      '<div class="map-drop">主要掉落：'+map.drops+'</div>'+
+      '<div style="margin-top:2px;"><button class="small" data-map="'+map.id+'">在此处挂机</button></div>';
+    box.appendChild(row);
+  });
+  box.querySelectorAll('button[data-map]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const id=parseInt(btn.getAttribute('data-map'));
+      game.currentMapId=id;
+      game.exploring=true;
+      battleCooldown=0;
+      addGlobalLog('你来到「'+MAPS.find(m=>m.id===id).name+'」开始游走磨砺。');
+      updateTopCurrentMap();
+      document.getElementById('btn-toggle-explore').textContent='停止挂机';
+      renderMaps();
+    });
+  });
+}
+
+// 装备渲染
+function formatQuality(q){
+  const info=QUALITY.find(x=>x.id===q) || QUALITY[0];
+  return info.name;
+}
+function renderEquipSlots(){
+  const ids = ['equip-slots','equip-slots-mini'];
+  ids.forEach(containerId=>{
+    const box=document.getElementById(containerId);
+    if(!box) return;
+    box.innerHTML='';
+    EQUIP_SLOTS.forEach(slot=>{
+      const cell=document.createElement('div');
+      cell.className='equip-slot';
+      const id=game.equipSlots[slot.id];
+      let nameHtml='<span class="equip-slot-empty">未装备</span>';
+      let extra='';
+      if(id){
+        const eq=game.equips.find(e=>e.id===id);
+        if(eq){
+          nameHtml='<span class="quality-'+eq.quality+'">'+eq.name+'</span>';
+          extra='<div class="small-label">'+formatQuality(eq.quality)+' · 攻+'+(eq.atk||0)+' 防+'+(eq.def||0)+'</div>';
+        }
+      }
+      cell.innerHTML=
+        '<div class="equip-slot-title">'+slot.name+'</div>'+
+        '<div class="equip-slot-name">'+nameHtml+'</div>'+
+        extra;
+      box.appendChild(cell);
+    });
+  });
+}
+function renderEquipList(){
+  const box=document.getElementById('equip-list');
+  box.innerHTML='';
+  game.equips.forEach(eq=>{
+    const row=document.createElement('div');
+    row.className='equip-item';
+    const main=document.createElement('div');
+    main.className='equip-item-main';
+    main.innerHTML=
+      '<span class="quality-'+eq.quality+'">'+eq.name+'</span>'+
+      '<span class="small-label">'+eq.slotName+' · 攻+'+(eq.atk||0)+' 防+'+(eq.def||0)+'</span>';
+    const btnBox=document.createElement('div');
+    const b1=document.createElement('button');
+    b1.textContent='穿戴';
+    b1.className='small';
+    b1.addEventListener('click',()=>{
+      game.equipSlots[eq.slot]=eq.id;
+      recalcStats();
+      updateAllUI();
+    });
+    const b2=document.createElement('button');
+    b2.textContent='出售';
+    b2.className='small';
+    b2.addEventListener('click',()=>{
+      const price = 20 * eq.quality;
+      game.player.gold += price;
+      game.equips = game.equips.filter(e=>e.id!==eq.id);
+      Object.keys(game.equipSlots).forEach(slot=>{
+        if(game.equipSlots[slot]===eq.id) game.equipSlots[slot]=null;
+      });
+      addGlobalLog('你出售了「'+eq.name+'」，获得灵石 '+price+'。');
+      recalcStats();
+      updateAllUI();
+    });
+    btnBox.appendChild(b1);
+    btnBox.appendChild(b2);
+    row.appendChild(main);
+    row.appendChild(btnBox);
+    box.appendChild(row);
+  });
+}
+
+// 一键出售低品质
+function sellLowQualityEquip(){
+  const keepQuality=4; // 保留上品及以上
+  let gain=0;
+  const toSell=game.equips.filter(eq=>eq.quality<keepQuality);
+  toSell.forEach(eq=>{
+    gain += 15 * eq.quality;
+    Object.keys(game.equipSlots).forEach(slot=>{
+      if(game.equipSlots[slot]===eq.id) game.equipSlots[slot]=null;
+    });
+  });
+  game.equips = game.equips.filter(eq=>eq.quality>=keepQuality);
+  if(gain>0){
+    game.player.gold += gain;
+    addGlobalLog('你一键出售了部分低品质法器，获得灵石 '+gain+'。');
+  }else{
+    addGlobalLog('当前没有可出售的低品质法器。');
+  }
+  recalcStats();
   updateAllUI();
-  setInterval(tick,TICK_MS);
-  setInterval(saveGame,15000);
+}
+
+// 百宝袋
+function addItem(id,name,type,qty){
+  const bag=game.bag;
+  let it=bag.find(x=>x.id===id);
+  if(!it){
+    it={id,name,type,qty};
+    bag.push(it);
+  }else{
+    it.qty+=qty;
+  }
+}
+function renderBag(){
+  const box=document.getElementById('bag-list');
+  box.innerHTML='';
+  if(game.bag.length===0){
+    box.innerHTML='<div class="small-label">尚无任何物品。</div>';
+    return;
+  }
+  game.bag.forEach(it=>{
+    const row=document.createElement('div');
+    row.className='item-row';
+    const main=document.createElement('div');
+    main.className='item-main';
+    main.innerHTML='<span>'+it.name+'</span><span class="small-label">数量：'+it.qty+'</span>';
+    const btnBox=document.createElement('div');
+    if(it.type==='pill' || it.type==='root' || it.type==='scroll'){
+      const btn=document.createElement('button');
+      btn.textContent='使用';
+      btn.className='small';
+      btn.addEventListener('click',()=>useItem(it.id));
+      btnBox.appendChild(btn);
+    }
+    row.appendChild(main);
+    row.appendChild(btnBox);
+    box.appendChild(row);
+  });
+}
+function useItem(id){
+  const it=game.bag.find(x=>x.id===id);
+  if(!it || it.qty<=0) return;
+  const p=game.player;
+  if(id==='pill_hp_small'){
+    const heal=Math.round(p.hpMax*0.3);
+    p.hp=Math.min(p.hp+heal,p.hpMax);
+    addGlobalLog('你服下「回元丹」，恢复气血 '+heal+'。','good');
+  }else if(id==='pill_qi_small'){
+    p.qi += 200;
+    const need=getRealmObj().qi;
+    if(p.qi>need) p.qi=need;
+    addGlobalLog('你服下「聚灵丹」，获得 200 点境界灵气。','good');
+  }else if(id==='pill_root'){
+    if(game.player.realmIndex<8){
+      alert('至少突破到「结丹·中」后，方可承受洗髓伐骨之痛。');
+      return;
+    }
+    if(p.root>=15){
+      alert('你的灵根已经无法再被提升。');
+    }else{
+      p.root+=1;
+      addGlobalLog('你服下「洗髓伐骨丹」，只觉全身经脉被重新洗炼，灵根提升至 '+p.root+'。','good');
+    }
+  }else if(id==='scroll_sword'){
+    if(p.activeSkills.indexOf('skill_sword')===-1){
+      p.activeSkills.push('skill_sword');
+      addGlobalLog('你参悟「剑势秘卷」，掌握神通「剑势·破云」。','good');
+    }else{
+      addGlobalLog('你已经掌握了「剑势·破云」，额外的秘卷难再带来收获。');
+    }
+  }
+  it.qty-=1;
+  if(it.qty<=0){
+    game.bag=game.bag.filter(x=>x.id!==id);
+  }
+  recalcStats();
+  updateAllUI();
+}
+
+// 锻造列表
+function renderForge(){
+  const box=document.getElementById('forge-list');
+  box.innerHTML='';
+  FORGE_RECIPES.forEach(rec=>{
+    const row=document.createElement('div');
+    row.className='item-row';
+    const main=document.createElement('div');
+    main.className='item-main';
+    const qName=formatQuality(rec.quality);
+    const slotName = (EQUIP_SLOTS.find(s=>s.id===rec.slot)||{}).name || '';
+    let needText=rec.need.map(n=>n.name+'×'+n.qty).join('，');
+    main.innerHTML=
+      '<span>'+rec.name+'（'+qName+' · '+slotName+'）</span>'+
+      '<span class="small-label">需要：'+needText+'；灵石 '+rec.gold+'</span>';
+    const btn=document.createElement('button');
+    btn.textContent='锻造';
+    btn.className='small';
+    btn.addEventListener('click',()=>doForge(rec));
+    row.appendChild(main);
+    row.appendChild(btn);
+    box.appendChild(row);
+  });
+}
+function doForge(rec){
+  const p=game.player;
+  if(p.gold<rec.gold){
+    alert('灵石不足，无法锻造。');
+    return;
+  }
+  // 材料检查
+  for(let i=0;i<rec.need.length;i++){
+    const need=rec.need[i];
+    const it=game.bag.find(x=>x.id===need.id);
+    if(!it || it.qty<need.qty){
+      alert('材料不足：需要 '+need.name+'×'+need.qty);
+      return;
+    }
+  }
+  // 扣除
+  p.gold-=rec.gold;
+  rec.need.forEach(need=>{
+    const it=game.bag.find(x=>x.id===need.id);
+    it.qty-=need.qty;
+    if(it.qty<=0) game.bag=game.bag.filter(x=>x.id!==need.id);
+  });
+  // 生成装备
+  const id='eq_'+Date.now()+'_'+Math.floor(Math.random()*9999);
+  game.equips.push({
+    id,
+    name:rec.name,
+    slot:rec.slot,
+    slotName:(EQUIP_SLOTS.find(s=>s.id===rec.slot)||{}).name||'',
+    quality:rec.quality,
+    atk:rec.atk,
+    def:rec.def
+  });
+  game.stats.forgeCount++;
+  addGlobalLog('你在玄火锻造炉中打造出「'+rec.name+'」。','good');
+  updateSectTasksByForge();
+  recalcStats();
+  updateAllUI();
+}
+
+// 万宝阁
+function renderShop(){
+  const box=document.getElementById('shop-list');
+  box.innerHTML='';
+  SHOP_ITEMS.forEach(it=>{
+    const row=document.createElement('div');
+    row.className='item-row';
+    const main=document.createElement('div');
+    main.className='item-main';
+    let extra='';
+    if(it.needRealm!==undefined){
+      extra='（需境界：'+realmName(it.needRealm)+' 或以上）';
+    }
+    main.innerHTML=
+      '<span>'+it.name+extra+'</span>'+
+      '<span class="small-label">'+it.desc+' 价格：'+it.price+' 灵石</span>';
+    const btn=document.createElement('button');
+    btn.textContent='购买';
+    btn.className='small';
+    btn.addEventListener('click',()=>buyShopItem(it));
+    row.appendChild(main);
+    row.appendChild(btn);
+    box.appendChild(row);
+  });
+}
+function buyShopItem(it){
+  const p=game.player;
+  if(p.gold<it.price){
+    alert('灵石不足。');
+    return;
+  }
+  if(it.needRealm!==undefined && p.realmIndex<it.needRealm){
+    alert('境界不足，暂无法购买此物。');
+    return;
+  }
+  p.gold-=it.price;
+  addGlobalLog('你在万宝阁中购得「'+it.name+'」。');
+  // 加入百宝袋
+  if(it.id==='pill_hp_small' || it.id==='pill_qi_small' || it.id==='pill_root' || it.id==='scroll_sword'){
+    const type = it.type;
+    addItem(it.id,it.name,type,1);
+  }
+  updateAllUI();
+}
+
+// 宗门
+function renderSects(){
+  const box=document.getElementById('sect-list');
+  box.innerHTML='';
+  SECTS.forEach(sect=>{
+    const card=document.createElement('div');
+    card.className='sect-card';
+    const joined = (game.player.sectId===sect.id);
+    const bonusText=[];
+    if(sect.bonus.atk) bonusText.push('攻击+'+Math.round(sect.bonus.atk*100)+'%');
+    if(sect.bonus.def) bonusText.push('防御+'+Math.round(sect.bonus.def*100)+'%');
+    if(sect.bonus.hp)  bonusText.push('气血+'+Math.round(sect.bonus.hp*100)+'%');
+    if(sect.bonus.qi)  bonusText.push('灵气获取+'+Math.round(sect.bonus.qi*100)+'%');
+    if(sect.bonus.crit) bonusText.push('暴击+'+Math.round(sect.bonus.crit*100)+'%');
+    if(sect.bonus.str) bonusText.push('力道+'+sect.bonus.str);
+    if(sect.bonus.vit) bonusText.push('体魄+'+sect.bonus.vit);
+    if(sect.bonus.agi) bonusText.push('身法+'+sect.bonus.agi);
+    if(sect.bonus.wis) bonusText.push('悟性+'+sect.bonus.wis);
+    card.innerHTML=
+      '<div class="sect-name">'+sect.name+'</div>'+
+      '<div class="small-label">'+sect.desc+'</div>'+
+      '<div class="small-label">宗门加成：'+bonusText.join('，')+'</div>';
+    const btn=document.createElement('button');
+    btn.textContent = joined ? '已加入' : '拜入此门';
+    btn.className='small';
+    if(joined){
+      btn.disabled=true;
+    }else{
+      btn.addEventListener('click',()=>{
+        if(game.player.sectId){
+          alert('你已经有宗门了，不可反复跳槽。');
+          return;
+        }
+        game.player.sectId=sect.id;
+        game.sect.id=sect.id;
+        initSectTasks();
+        addGlobalLog('你拜入了「'+sect.name+'」，自此踏入宗门体系。','good');
+        recalcStats();
+        updateAllUI();
+      });
+    }
+    card.appendChild(btn);
+    box.appendChild(card);
+  });
+}
+function initSectTasks(){
+  game.sect.tasks=[];
+  const pool=[...SECT_TASK_TEMPLATES];
+  for(let i=0;i<3 && pool.length>0;i++){
+    const idx=randInt(pool.length);
+    const t=Object.assign({},pool[idx]);
+    t.progress=0;
+    t.done=false;
+    game.sect.tasks.push(t);
+    pool.splice(idx,1);
+  }
+}
+function renderSectPanel(){
+  document.getElementById('sect-current-name').textContent = game.player.sectId ?
+    (SECTS.find(s=>s.id===game.player.sectId)||{}).name || '未知宗门' : '未加入';
+  document.getElementById('sect-contrib').textContent = game.sect.contrib || 0;
+  const box=document.getElementById('sect-task-list');
+  box.innerHTML='';
+  if(!game.player.sectId){
+    box.innerHTML='<div class="small-label">尚未加入任何宗门，无法接取任务。</div>';
+  }else if(game.sect.tasks.length===0){
+    box.innerHTML='<div class="small-label">宗门暂未安排任务。</div>';
+  }else{
+    game.sect.tasks.forEach(t=>{
+      const row=document.createElement('div');
+      row.className='sect-task-row';
+      const prog=t.progress||0;
+      const need=t.need||0;
+      const main=document.createElement('div');
+      main.className='item-main';
+      main.innerHTML=
+        '<span>'+t.desc+'</span>'+
+        '<span class="small-label">进度：'+prog+'/'+need+' · 完成奖励：贡献 '+t.reward+'</span>';
+      const btn=document.createElement('button');
+      btn.textContent=t.done?'已完成':'领取奖励';
+      btn.className='small';
+      if(prog<need || t.done){
+        if(!t.done) btn.disabled=true;
+        else btn.disabled=true;
+      }else{
+        btn.addEventListener('click',()=>{
+          t.done=true;
+          game.sect.contrib += t.reward;
+          game.stats.sectTasksDone++;
+          addGlobalLog('你完成了宗门任务「'+t.desc+'」，获得贡献 '+t.reward+'。','good');
+          // 自动刷新任务：新生成一条替换
+          const pool=SECT_TASK_TEMPLATES.filter(tmp=>!game.sect.tasks.some(tt=>tt.id===tmp.id && !tt.done));
+          if(pool.length>0){
+            const nt=Object.assign({},randChoice(pool));
+            nt.progress=0;
+            nt.done=false;
+            const idx=game.sect.tasks.indexOf(t);
+            if(idx>=0) game.sect.tasks[idx]=nt;
+          }
+          updateAllUI();
+        });
+      }
+      row.appendChild(main);
+      row.appendChild(btn);
+      box.appendChild(row);
+    });
+  }
+  // 宗门宝库（简单版）
+  const shop=document.getElementById('sect-shop-list');
+  shop.innerHTML='';
+  const items=[
+    {id:'sect_sword', name:'宗门长剑', need:120, effect:'equip', eq:{slot:'weapon',name:'宗门长剑',quality:4,atk:45,def:4}},
+    {id:'sect_armor', name:'护宗战甲', need:140, effect:'equip', eq:{slot:'armor',name:'护宗战甲',quality:4,atk:5,def:40}},
+    {id:'sect_pet_egg', name:'灵兽蛋', need:200, effect:'pet'}
+  ];
+  items.forEach(it=>{
+    const row=document.createElement('div');
+    row.className='item-row';
+    const main=document.createElement('div');
+    main.className='item-main';
+    main.innerHTML='<span>'+it.name+'</span><span class="small-label">需要宗门贡献 '+it.need+'</span>';
+    const btn=document.createElement('button');
+    btn.textContent='兑换';
+    btn.className='small';
+    btn.addEventListener('click',()=>{
+      if(game.sect.contrib<it.need){
+        alert('宗门贡献不足。');
+        return;
+      }
+      game.sect.contrib-=it.need;
+      if(it.effect==='equip'){
+        const id='eq_'+Date.now()+'_'+Math.floor(Math.random()*9999);
+        game.equips.push({
+          id,
+          name:it.eq.name,
+          slot:it.eq.slot,
+          slotName:(EQUIP_SLOTS.find(s=>s.id===it.eq.slot)||{}).name||'',
+          quality:it.eq.quality,
+          atk:it.eq.atk,
+          def:it.eq.def
+        });
+        addGlobalLog('你在宗门宝库中兑换了「'+it.name+'」。','good');
+      }else if(it.effect==='pet'){
+        const pet={
+          id:game.nextPetId++,
+          name:'宗门灵兽',
+          level:1,
+          atk:40,
+          xp:0
+        };
+        game.pets.push(pet);
+        game.stats.petCount++;
+        if(!game.activePetId) game.activePetId=pet.id;
+        addGlobalLog('你从宗门宝库中得到一只「宗门灵兽」。','good');
+      }
+      recalcStats();
+      updateAllUI();
+    });
+    row.appendChild(main);
+    row.appendChild(btn);
+    shop.appendChild(row);
+  });
+}
+
+// 灵宠
+function renderPets(){
+  const list=document.getElementById('pet-list');
+  list.innerHTML='';
+  if(game.pets.length===0){
+    list.innerHTML='<div class="small-label">尚未收服任何灵宠。</div>';
+  }else{
+    game.pets.forEach(pet=>{
+      const row=document.createElement('div');
+      row.className='pet-row';
+      row.innerHTML=
+        '<span>'+pet.name+' Lv.'+pet.level+' · 攻击 '+pet.atk+'</span>'+
+        '<span class="small-label">经验 '+(pet.xp||0)+'</span>';
+      row.addEventListener('click',()=>{
+        game.activePetId=pet.id;
+        addGlobalLog('你让「'+pet.name+'」出战随行。');
+        recalcStats();
+        updateAllUI();
+      });
+      list.appendChild(row);
+    });
+  }
+  const active = game.pets.find(x=>x.id===game.activePetId) || null;
+  document.getElementById('active-pet-text').textContent = active ? active.name+' · 攻击 '+active.atk : '无';
+  document.getElementById('active-pet-text-mini').textContent = active ? active.name : '无';
+  document.getElementById('active-pet-atk').textContent = active ? active.atk : 0;
+}
+
+// 试炼之塔
+function challengeTower(floor){
+  const p=game.player;
+  const bonus=getRebirthBonus();
+  const baseHp = 250 + floor*120;
+  const baseAtk = 55 + floor*35;
+  let mHpMax=Math.round(baseHp*(1+floor*0.08));
+  let mAtk=Math.round(baseAtk*(1+floor*0.06));
+  let mHp=mHpMax;
+  let playerHp=p.hpMax;
+  const pet=game.pets.find(x=>x.id===game.activePetId)||null;
+  const petAtk=pet?pet.atk:0;
+  let rounds=0;
+  let playerDead=false, monsterDead=false;
+  addTowerLog('—— 试炼之塔 第 '+floor+' 层试炼开始（塔怪气血 '+mHpMax+' · 攻击 '+mAtk+'）——');
+  while(rounds<14 && !playerDead && !monsterDead){
+    rounds++;
+    let dmg=p.atk*bonus.atkMul + petAtk;
+    let critFlag=false;
+    if(Math.random()<p.critRate){
+      dmg=Math.round(dmg*1.6);
+      critFlag=true;
+    }
+    dmg=Math.max(1,Math.round(dmg*0.85));
+    mHp-=dmg;
+    addTowerLog('第'+rounds+'回合，你对塔怪造成 '+dmg+' 伤害'+(critFlag?'（暴击）':'')+'，塔怪剩余 '+Math.max(mHp,0)+'。');
+    if(mHp<=0){monsterDead=true;break;}
+    let mDmg=Math.max(1,Math.round(mAtk*0.75 - p.def*bonus.defMul*0.45));
+    mDmg=Math.max(1,mDmg);
+    playerHp-=mDmg;
+    addTowerLog('　　 塔怪反击，对你造成 '+mDmg+' 伤害，你剩余 '+Math.max(playerHp,0)+'。');
+    if(playerHp<=0){playerDead=true;break;}
+  }
+  // 恢复
+  p.hp=p.hpMax;
+  p.mp=p.mpMax;
+  if(monsterDead){
+    const goldGain = 70 + floor*25;
+    const qiGain = (120 + floor*45) * (p.qiMul||1) * bonus.qiMul;
+    p.gold += goldGain;
+    p.qi += qiGain;
+    game.tower.maxFloor = Math.max(game.tower.maxFloor, floor);
+    game.tower.curFloor = floor;
+    addTowerLog('你通过了第 '+floor+' 层试炼，获得灵石 '+goldGain+'，灵气 '+Math.round(qiGain)+'。');
+    if(floor%5===0){
+      game.rebirth.soul+=1;
+      addTowerLog('你在连续的试炼中领悟更深一层道理，悟道点 +1。');
+    }
+  }else if(playerDead){
+    addTowerLog('你未能通过第 '+floor+' 层试炼，只得暂且退回塔外。');
+  }else{
+    addTowerLog('你与塔怪鏖战许久，终究难分胜负，只得暂退。');
+  }
+  recalcStats();
+  updateAllUI();
+}
+
+// 转生
+function updateRebirthUI(){
+  const bonus=getRebirthBonus();
+  document.getElementById('rebirth-count').textContent=game.rebirth.count;
+  document.getElementById('rebirth-soul').textContent=game.rebirth.soul;
+  document.getElementById('rebirth-bonus-text').textContent=
+    '攻击 ×'+bonus.atkMul.toFixed(2)+'；防御 ×'+bonus.defMul.toFixed(2)+'；灵气获取 ×'+bonus.qiMul.toFixed(2);
+}
+function doRebirth(){
+  const p=game.player;
+  if(p.realmIndex<22){ // 大乘·初
+    alert('至少达到「大乘·初」之后，才可考虑转生重修。');
+    return;
+  }
+  if(!confirm('确定要转生重修吗？你将失去当前修为、装备、灵石等，仅保留悟道加成。')) return;
+  const gainSoul = Math.max(1, Math.floor(game.tower.maxFloor/5) + Math.floor(game.stats.breakthroughs/10));
+  addGlobalLog('你选择放弃当前一切修为，转生重修，获得悟道点 '+gainSoul+'。','warn');
+  game.rebirth.count += 1;
+  game.rebirth.soul  += gainSoul;
+  const reb = game.rebirth;
+  game = defaultGame();
+  game.rebirth = reb;
+  addGlobalLog('你在另一个角落重新睁开双眼，往日历练皆化为心中烙印。','good');
+  recalcStats();
+  updateAllUI();
+}
+
+// 宗门任务进度
+function updateSectTasksByKill(kind){
+  if(!game.player.sectId) return;
+  game.sect.tasks.forEach(t=>{
+    if(t.done) return;
+    if(t.type==='kill'){
+      t.progress = (t.progress||0)+1;
+    }else if(t.type==='elite' && kind==='elite'){
+      t.progress = (t.progress||0)+1;
+    }else if(t.type==='boss' && kind==='boss'){
+      t.progress = (t.progress||0)+1;
+    }
+  });
+}
+function updateSectTasksByForge(){
+  if(!game.player.sectId) return;
+  game.sect.tasks.forEach(t=>{
+    if(t.done) return;
+    if(t.type==='forge'){
+      t.progress = (t.progress||0)+1;
+    }
+  });
+}
+function updateSectTasksByRealm(){
+  if(!game.player.sectId) return;
+  const idx=game.player.realmIndex;
+  game.sect.tasks.forEach(t=>{
+    if(t.done) return;
+    if(t.type==='realm'){
+      if(idx>=t.need) t.progress=t.need;
+    }
+  });
+}
+
+// 战斗
+function simulateBattle(){
+  if(!game.exploring || game.currentMapId===null) return;
+  const map=MAPS.find(m=>m.id===game.currentMapId);
+  if(!map) return;
+  const p=game.player;
+  const pet=game.pets.find(x=>x.id===game.activePetId)||null;
+  const petAtk=pet?pet.atk:0;
+
+  // 遭遇类型
+  const r=Math.random();
+  let kind='normal';
+  if(r<0.12) kind='boss';
+  else if(r<0.35) kind='elite';
+
+  const diffMul = 1 + map.diff*0.28;
+  let hpMul = diffMul, atkMul=diffMul;
+  if(kind==='elite'){ hpMul*=1.5; atkMul*=1.35; }
+  if(kind==='boss'){ hpMul*=2.2; atkMul*=1.8; }
+
+  const baseHp = 80 + map.qi*12;
+  const baseAtk = 12 + map.qi*0.65;
+  const mHpMax=Math.round(baseHp*hpMul);
+  const mAtk=Math.round(baseAtk*atkMul);
+
+  let mHp=mHpMax;
+  let playerHp=p.hpMax;
+  let rounds=0;
+  let monsterDead=false, playerDead=false;
+
+  addBattleLog('—— 在「'+map.name+'」遭遇【'+(kind==='normal'?'普通':kind==='elite'?'精英':'首领')+'】敌人（气血 '+mHpMax+' · 攻击 '+mAtk+'）——');
+
+  while(rounds<8 && !monsterDead && !playerDead){
+    rounds++;
+    // 玩家出手
+    let dmg=p.atk + petAtk;
+    let critFlag=false;
+    if(Math.random()<p.critRate){
+      dmg=Math.round(dmg*1.5);
+      critFlag=true;
+    }
+    dmg=Math.max(1,Math.round(dmg*0.8));
+    mHp-=dmg;
+    addBattleLog('第'+rounds+'回合，你造成 '+dmg+' 点伤害'+(critFlag?'（暴击）':'')+'，敌人剩余 '+Math.max(mHp,0)+'。');
+    if(mHp<=0){monsterDead=true;break;}
+    // 怪物反击
+    let mDmg=Math.max(1,Math.round(mAtk*0.75 - p.def*0.5));
+    if(mDmg<1) mDmg=1;
+    playerHp-=mDmg;
+    addBattleLog('　　 敌人反击，对你造成 '+mDmg+' 点伤害，你剩余 '+Math.max(playerHp,0)+'。');
+    if(playerHp<=0){playerDead=true;break;}
+  }
+
+  // 战后恢复（挂机特性）
+  p.hp=p.hpMax;
+  p.mp=p.mpMax;
+
+  if(monsterDead){
+    // 基础奖励
+    const baseGold = 4 + map.diff*2;
+    const baseQi = 6 + map.diff*5;
+    let goldGain=baseGold;
+    let qiGain=baseQi * (p.qiMul||1);
+    if(kind==='elite'){ goldGain*=3; qiGain*=4; }
+    if(kind==='boss'){ goldGain*=7; qiGain*=9; }
+    goldGain=Math.round(goldGain);
+    qiGain=Math.round(qiGain);
+    p.gold += goldGain;
+    p.qi += qiGain;
+    const need=getRealmObj().qi;
+    if(p.qi>need) p.qi=need;
+    addBattleLog('你击败了敌人，获得灵石 '+goldGain+'、灵气 '+qiGain+'。','good');
+    game.stats.totalKills++;
+    updateSectTasksByKill(kind);
+    if(kind==='elite') game.stats.eliteKills++;
+    if(kind==='boss') game.stats.bossKills++;
+
+    // 掉落（爆率偏低）
+    const equipChance = kind==='normal'?0.10:(kind==='elite'?0.28:0.55);
+    const matChance   = kind==='normal'?0.16:(kind==='elite'?0.32:0.55);
+    const scrollChance = kind==='elite'?0.05:(kind==='boss'?0.12:0.005);
+    const petChance = (kind!=='normal' && Math.random()<0.06);
+
+    if(Math.random()<equipChance){
+      const qRoll=Math.random();
+      let q=1;
+      if(qRoll>0.92) q=6;
+      else if(qRoll>0.86) q=5;
+      else if(qRoll>0.76) q=4;
+      else if(qRoll>0.6) q=3;
+      else q=2;
+      const slot=randChoice(EQUIP_SLOTS);
+      const id='eq_'+Date.now()+'_'+Math.floor(Math.random()*9999);
+      const name = (QUALITY.find(x=>x.id===q)||QUALITY[0]).name + '·' + slot.name;
+      const atkBase = 4 + map.diff*4 + q*4;
+      const defBase = 2 + map.diff*3 + q*3;
+      game.equips.push({
+        id,
+        name,
+        slot:slot.id,
+        slotName:slot.name,
+        quality:q,
+        atk:atkBase,
+        def:defBase
+      });
+      addBattleLog('你从敌人身上获得了法器「'+name+'」。','good');
+    }
+    if(Math.random()<matChance){
+      const mats = [
+        {id:'mat_iron', name:'玄铁矿'},
+        {id:'mat_fire', name:'火焰晶核'},
+        {id:'mat_ice', name:'寒冰灵髓'}
+      ];
+      const mat=randChoice(mats);
+      addItem(mat.id,mat.name,'mat',1);
+      addBattleLog('你获得了材料「'+mat.name+'」。');
+    }
+    if(Math.random()<scrollChance){
+      addItem('scroll_sword','剑势秘卷','scroll',1);
+      addBattleLog('你从敌人身上找到一卷残破的「剑势秘卷」。','good');
+    }
+    if(petChance){
+      const pet={
+        id:game.nextPetId++,
+        name:kind==='boss'?'妖王幼崽':'灵兽',
+        level:1,
+        atk:15 + map.diff*5,
+        xp:0
+      };
+      game.pets.push(pet);
+      game.stats.petCount++;
+      if(!game.activePetId) game.activePetId=pet.id;
+      addBattleLog('你收服了新的灵宠「'+pet.name+'」。','good');
+    }
+  }else{
+    // 失败但不停止挂机
+    game.stats.deaths++;
+    addBattleLog('你被敌人击败，本场战斗无任何收获，但你很快又振作起来继续挑战。','bad');
+  }
+  recalcStats();
+  updateAllUI();
+}
+
+// 突破
+function tryBreakthrough(){
+  const p=game.player;
+  const realm=getRealmObj();
+  const need=realm.qi;
+  if(p.qi<need){
+    alert('当前灵气不足，无法突破。');
+    return;
+  }
+  const nextIndex=p.realmIndex+1;
+  if(nextIndex>=REALM_STEPS.length){
+    alert('你已登临此版本境界巅峰。');
+    return;
+  }
+  const nextName=realmName(nextIndex);
+  // 渡劫失败机制
+  if(nextName.indexOf('渡劫')!==-1){
+    const failRate=0.35;
+    if(Math.random()<failRate){
+      const lost=Math.floor(p.qi/2);
+      p.qi-=lost;
+      if(p.qi<0) p.qi=0;
+      addGlobalLog('你尝试渡劫突破「'+nextName+'」失败，被天劫劈得七窍生烟，损失灵气 '+lost+' 点。','bad');
+      updateRoleUI();
+      return;
+    }
+  }
+  p.qi-=need;
+  p.realmIndex=nextIndex;
+  game.stats.breakthroughs++;
+  const gainPts=6;
+  p.freePoints+=gainPts;
+  addGlobalLog('你成功突破至「'+realmName(p.realmIndex)+'」，获得 '+gainPts+' 点可分配属性点。','good');
+  updateSectTasksByRealm();
+  recalcStats();
+  updateAllUI();
+}
+
+// UI 更新
+function updateTopCurrentMap(){
+  const pill=document.getElementById('top-map-pill');
+  if(!game.currentMapId){
+    pill.textContent='当前未选择挂机地点';
+  }else{
+    const map=MAPS.find(m=>m.id===game.currentMapId);
+    pill.textContent='当前挂机：'+(map?map.name:'未知');
+  }
+}
+function updateRoleUI(){
+  const p=game.player;
+  document.getElementById('top-name').textContent=p.name;
+  document.getElementById('top-realm').textContent=realmName(p.realmIndex);
+  document.getElementById('top-root').textContent=p.root;
+  document.getElementById('top-qi').textContent=Math.floor(p.qi)+' / '+getRealmObj().qi;
+  document.getElementById('top-power').textContent=Math.floor(p.power);
+  document.getElementById('top-gold').textContent=Math.floor(p.gold);
+  document.getElementById('hp-text').textContent=p.hp+' / '+p.hpMax;
+  document.getElementById('mp-text').textContent=p.mp+' / '+p.mpMax;
+  document.getElementById('atk-text').textContent=p.atk;
+  document.getElementById('def-text').textContent=p.def;
+  document.getElementById('crit-text').textContent=(p.critRate*100).toFixed(1)+'%';
+  document.getElementById('need-qi-text').textContent=getRealmObj().qi;
+  document.getElementById('attr-str').textContent=p.attrs.str;
+  document.getElementById('attr-vit').textContent=p.attrs.vit;
+  document.getElementById('attr-agi').textContent=p.attrs.agi;
+  document.getElementById('attr-wis').textContent=p.attrs.wis;
+  document.getElementById('attr-free').textContent=p.freePoints;
+  const sectPill=document.getElementById('top-sect-pill');
+  if(p.sectId){
+    const sect=SECTS.find(s=>s.id===p.sectId);
+    sectPill.textContent='所属宗门：'+(sect?sect.name:'未知');
+  }else{
+    sectPill.textContent='未加入宗门';
+  }
+}
+function updateStatsPage(){
+  const s=game.stats;
+  document.getElementById('stat-kill').textContent=s.totalKills;
+  document.getElementById('stat-elite').textContent=s.eliteKills;
+  document.getElementById('stat-boss').textContent=s.bossKills;
+  document.getElementById('stat-death').textContent=s.deaths;
+  document.getElementById('stat-break').textContent=s.breakthroughs;
+  document.getElementById('stat-forge').textContent=s.forgeCount;
+  document.getElementById('stat-pets').textContent=s.petCount;
+  document.getElementById('stat-sect').textContent=s.sectTasksDone;
+  document.getElementById('stat-tower').textContent=game.tower.maxFloor;
+}
+function updateTowerUI(){
+  document.getElementById('tower-max-floor').textContent=game.tower.maxFloor;
+  document.getElementById('tower-cur-floor').textContent=game.tower.curFloor;
+}
+function updateAllUI(){
+  updateRoleUI();
+  renderEquipSlots();
+  renderEquipList();
+  renderBag();
+  renderForge();
+  renderSects();
+  renderSectPanel();
+  renderPets();
+  renderShop();
+  updateStatsPage();
+  updateTopCurrentMap();
+  updateRebirthUI();
+  updateTowerUI();
+}
+
+// 主循环
+function tick(){
+  if(game.exploring && game.currentMapId!==null){
+    if(battleCooldown<=0){
+      simulateBattle();
+      battleCooldown=BATTLE_INTERVAL;
+    }else{
+      battleCooldown-=TICK_MS;
+      if(battleCooldown<0) battleCooldown=0;
+    }
+  }else{
+    // 不挂机时，每秒固定 +1 点境界灵气
+    const p=game.player;
+    const base = 1 * (TICK_MS/1000);
+    p.qi += base;
+    const need=getRealmObj().qi;
+    if(p.qi>need) p.qi=need;
+    updateRoleUI();
+  }
+}
+
+// 初始化
+window.addEventListener('load',()=>{
+  loadGame();
+  recalcStats();
+  initAttrButtons();
+  initNav();
+  renderMaps();
+  document.getElementById('btn-toggle-explore').addEventListener('click',()=>{
+    game.exploring=!game.exploring;
+    if(game.exploring && !game.currentMapId){
+      game.currentMapId=MAPS[0].id;
+      updateTopCurrentMap();
+    }
+    document.getElementById('btn-toggle-explore').textContent=game.exploring?'停止挂机':'开始挂机';
+  });
+  document.getElementById('btn-break').addEventListener('click',tryBreakthrough);
+  document.getElementById('btn-save').addEventListener('click',()=>{
+    saveGame();
+    addGlobalLog('手动存档完成。');
+  });
+  document.getElementById('btn-sell-low').addEventListener('click',sellLowQualityEquip);
+  document.getElementById('btn-tower-next').addEventListener('click',()=>{
+    const floor = game.tower.maxFloor+1;
+    challengeTower(floor);
+  });
+  document.getElementById('btn-tower-repeat').addEventListener('click',()=>{
+    const floor = game.tower.curFloor || 1;
+    challengeTower(floor);
+  });
+  document.getElementById('btn-rebirth-do').addEventListener('click',doRebirth);
+  updateAllUI();
+  setInterval(tick, TICK_MS);
+  setInterval(saveGame, 15000);
 });
 </script>
 </body>
 </html>
+'''
+
+path = Path("/mnt/data/xuanyu-idle-full-world-v4.html")
+path.write_text(html, encoding="utf-8")
+len(html), str(path)
